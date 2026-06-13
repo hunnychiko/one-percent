@@ -1,0 +1,26 @@
+# Android
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+google-services.json
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Node
+node_modules/
+functions/node_modules/
+
+# Keys
+*.keystore
+*.jks
