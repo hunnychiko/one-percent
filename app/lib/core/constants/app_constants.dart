@@ -31,6 +31,7 @@ abstract class AppConstants {
   static const String keyLanguage = 'language';
   static const String keyAdRemoved = 'ad_removed';
   static const String keyUnlockedSounds = 'unlocked_sounds';
+  static const String keyMixes = 'saved_mixes';
 }
 
 abstract class SoundCategory {

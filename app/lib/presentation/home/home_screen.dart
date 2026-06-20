@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/sound_model.dart';
 import '../../data/repositories/sound_repository.dart';
 import '../../services/preferences_service.dart';
+import '../mix/mix_screen.dart';
 import '../player/player_screen.dart';
 import 'widgets/category_chip_bar.dart';
 import 'widgets/sound_card.dart';
@@ -17,7 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _selectedCategory;
-  int _currentTab = 0; // 0: All, 1: Favorites
+  int _currentTab = 0; // 0: All, 1: Favorites, 2: Mix
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +45,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   setState(() => _selectedCategory = cat),
             ),
           Expanded(
-            child: _currentTab == 0
-                ? _SoundList(category: _selectedCategory)
-                : const _FavoritesList(),
+            child: switch (_currentTab) {
+              0 => _SoundList(category: _selectedCategory),
+              1 => const _FavoritesList(),
+              _ => const MixTabView(),
+            },
           ),
-          const BannerAdWidget(),
+          if (_currentTab != 2) const BannerAdWidget(),
         ],
       ),
     );
@@ -70,6 +73,8 @@ class _TabBar extends StatelessWidget {
           _Tab(label: '전체', isSelected: currentTab == 0, onTap: () => onTabChanged(0)),
           const SizedBox(width: 8),
           _Tab(label: '즐겨찾기', isSelected: currentTab == 1, onTap: () => onTabChanged(1)),
+          const SizedBox(width: 8),
+          _Tab(label: '믹스', isSelected: currentTab == 2, onTap: () => onTabChanged(2)),
         ],
       ),
     );

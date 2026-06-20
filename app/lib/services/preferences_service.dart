@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/app_constants.dart';
+import '../data/models/mix_model.dart';
 
 part 'preferences_service.g.dart';
 
@@ -87,4 +88,29 @@ class PreferencesService {
 
   bool isSoundUnlocked(String soundId) =>
       getUnlockedSounds().contains(soundId);
+
+  // Saved mixes
+  List<MixModel> getMixes() {
+    final raw = _prefs.getStringList(AppConstants.keyMixes) ?? [];
+    return raw.map((s) {
+      try {
+        return MixModel.fromJsonString(s);
+      } catch (_) {
+        return null;
+      }
+    }).whereType<MixModel>().toList();
+  }
+
+  Future<void> saveMix(MixModel mix) async {
+    final mixes = getMixes().where((m) => m.id != mix.id).toList();
+    mixes.insert(0, mix);
+    await _prefs.setStringList(
+        AppConstants.keyMixes, mixes.map((m) => m.toJsonString()).toList());
+  }
+
+  Future<void> deleteMix(String id) async {
+    final mixes = getMixes().where((m) => m.id != id).toList();
+    await _prefs.setStringList(
+        AppConstants.keyMixes, mixes.map((m) => m.toJsonString()).toList());
+  }
 }
