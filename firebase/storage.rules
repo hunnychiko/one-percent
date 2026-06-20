@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null &&
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    // 사운드 파일: 누구나 읽기 (CDN 배포), 관리자만 쓰기
+    match /sounds/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() &&
+        request.resource.size <= 100 * 1024 * 1024 && // 100MB 제한
+        request.resource.contentType.matches('audio/.*');
+    }
+
+    // 썸네일: 누구나 읽기, 관리자만 쓰기
+    match /thumbnails/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() &&
+        request.resource.size <= 5 * 1024 * 1024 && // 5MB 제한
+        request.resource.contentType.matches('image/.*');
+    }
+
+    // 라이선스 증빙 파일: 관리자만
+    match /licenses/{fileName} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
