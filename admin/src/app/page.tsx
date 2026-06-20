@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { getSounds, updateSoundStatus } from '@/lib/sounds';
 import type { Sound, SoundStatus } from '@/lib/types';
@@ -136,7 +138,7 @@ export default function SoundListPage() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <Link
-                        href={`/sounds/${sound.id}`}
+                        href={`/sounds?id=${sound.id}`}
                         className="text-xs text-blue-400 hover:text-blue-300"
                       >
                         상세

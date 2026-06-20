@@ -37,9 +37,7 @@ class AudioPlayerService {
       ),
     );
 
-    await _player.setAudioSource(
-      sound.isLoopable ? LoopingAudioSource(child: audioSource) : audioSource,
-    );
+    await _player.setAudioSource(audioSource);
     await _player.setLoopMode(
         sound.isLoopable ? LoopMode.all : LoopMode.off);
     await _player.play();

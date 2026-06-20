@@ -10,15 +10,6 @@
     "source": "firebase/functions",
     "runtime": "nodejs20"
   },
-  "hosting": [
-    {
-      "target": "admin",
-      "public": "admin/out",
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ]
-    }
-  ],
   "emulators": {
     "auth": { "port": 9099 },
     "functions": { "port": 5001 },

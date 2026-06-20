@@ -1,7 +1,7 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getAuth } from 'firebase/auth';
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,30 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// 실제 Firebase 인스턴스 — 최초 호출 시 생성됨
+let _app: FirebaseApp | undefined;
+let _db: Firestore | undefined;
+let _storage: FirebaseStorage | undefined;
+let _auth: Auth | undefined;
 
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const auth = getAuth(app);
-export default app;
+function app(): FirebaseApp {
+  if (!_app) {
+    _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  }
+  return _app;
+}
+
+export function db(): Firestore {
+  if (!_db) _db = getFirestore(app());
+  return _db;
+}
+
+export function storage(): FirebaseStorage {
+  if (!_storage) _storage = getStorage(app());
+  return _storage;
+}
+
+export function auth(): Auth {
+  if (!_auth) _auth = getAuth(app());
+  return _auth;
+}

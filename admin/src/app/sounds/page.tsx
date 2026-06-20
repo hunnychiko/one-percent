@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+export const dynamic = 'force-dynamic';
+
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { getSound, updateSoundStatus, updateSound } from '@/lib/sounds';
 import type { Sound, SoundStatus } from '@/lib/types';
 import {
@@ -11,9 +13,11 @@ import {
 } from '@/lib/types';
 import { SoundStatusBadge } from '@/components/ui/SoundStatusBadge';
 
-export default function SoundDetailPage() {
-  const { id } = useParams<{ id: string }>();
+function SoundDetail() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const id = searchParams.get('id');
+
   const [sound, setSound] = useState<Sound | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -21,6 +25,7 @@ export default function SoundDetailPage() {
   const [sortOrder, setSortOrder] = useState(0);
 
   useEffect(() => {
+    if (!id) { setLoading(false); return; }
     getSound(id).then((s) => {
       setSound(s);
       setSortOrder(s?.sortOrder ?? 0);
@@ -29,7 +34,7 @@ export default function SoundDetailPage() {
   }, [id]);
 
   const handleStatusChange = async (status: SoundStatus) => {
-    if (!sound) return;
+    if (!sound || !id) return;
     setProcessing(true);
     await updateSoundStatus(id, status);
     setSound((prev) => prev ? { ...prev, status } : null);
@@ -37,10 +42,13 @@ export default function SoundDetailPage() {
   };
 
   const handleSortOrderSave = async () => {
+    if (!id) return;
     await updateSound(id, { sortOrder });
     setSound((prev) => prev ? { ...prev, sortOrder } : null);
     setEditingSortOrder(false);
   };
+
+  if (!id) return <div className="text-gray-500">ID가 없습니다.</div>;
 
   if (loading) {
     return (
@@ -50,17 +58,12 @@ export default function SoundDetailPage() {
     );
   }
 
-  if (!sound) {
-    return <div className="text-gray-500">사운드를 찾을 수 없습니다.</div>;
-  }
+  if (!sound) return <div className="text-gray-500">사운드를 찾을 수 없습니다.</div>;
 
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="text-gray-400 hover:text-white text-sm"
-        >
+        <button onClick={() => router.push('/')} className="text-gray-400 hover:text-white text-sm">
           ← 목록
         </button>
         <h1 className="text-2xl font-bold flex-1">
@@ -70,7 +73,6 @@ export default function SoundDetailPage() {
       </div>
 
       <div className="space-y-6">
-        {/* 기본 정보 */}
         <InfoCard title="기본 정보">
           <Row label="카테고리" value={CATEGORY_LABELS[sound.category] ?? sound.category} />
           <Row label="형식" value={sound.format.toUpperCase()} />
@@ -102,18 +104,12 @@ export default function SoundDetailPage() {
           <Row label="등록일" value={sound.createdAt.toLocaleString('ko-KR')} />
         </InfoCard>
 
-        {/* 다국어 이름 */}
         <InfoCard title="다국어 이름">
           {SUPPORTED_LANGUAGES.map((lang) => (
-            <Row
-              key={lang}
-              label={`${LANGUAGE_LABELS[lang]} (${lang})`}
-              value={sound.nameI18n[lang] || '—'}
-            />
+            <Row key={lang} label={`${LANGUAGE_LABELS[lang]} (${lang})`} value={sound.nameI18n[lang] || '—'} />
           ))}
         </InfoCard>
 
-        {/* 라이선스 */}
         <InfoCard title="라이선스">
           <Row label="유형" value={sound.license.type} />
           <Row label="출처" value={sound.license.source || '—'} />
@@ -122,7 +118,6 @@ export default function SoundDetailPage() {
           <Row label="출처 표기" value={sound.license.requiresAttribution ? '필요' : '불필요'} />
         </InfoCard>
 
-        {/* 검증 결과 */}
         {sound.validationResult && (
           <InfoCard title="검증 결과">
             <Row
@@ -133,34 +128,22 @@ export default function SoundDetailPage() {
                 </span>
               }
             />
-            {sound.validationResult.errors.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {sound.validationResult.errors.map((e, i) => (
-                  <p key={i} className="text-red-400 text-sm">• {e}</p>
-                ))}
-              </div>
-            )}
-            {sound.validationResult.warnings.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {sound.validationResult.warnings.map((w, i) => (
-                  <p key={i} className="text-yellow-400 text-sm">⚠ {w}</p>
-                ))}
-              </div>
-            )}
+            {sound.validationResult.errors.map((e, i) => (
+              <p key={i} className="text-red-400 text-sm mt-1">• {e}</p>
+            ))}
+            {sound.validationResult.warnings.map((w, i) => (
+              <p key={i} className="text-yellow-400 text-sm mt-1">⚠ {w}</p>
+            ))}
           </InfoCard>
         )}
 
-        {/* 파일 URL */}
         {sound.fileUrl && (
-          <InfoCard title="파일">
-            <div className="space-y-2">
-              <audio controls src={sound.fileUrl} className="w-full" />
-              <p className="text-gray-500 text-xs break-all">{sound.fileUrl}</p>
-            </div>
+          <InfoCard title="파일 미리듣기">
+            <audio controls src={sound.fileUrl} className="w-full" />
+            <p className="text-gray-500 text-xs break-all mt-2">{sound.fileUrl}</p>
           </InfoCard>
         )}
 
-        {/* 액션 버튼 */}
         <div className="flex gap-3">
           {sound.status === 'pending' && (
             <button
@@ -192,6 +175,18 @@ export default function SoundDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SoundDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <SoundDetail />
+    </Suspense>
   );
 }
 
