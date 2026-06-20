@@ -149,15 +149,15 @@ class _TimerPickerSheetState extends State<TimerPickerSheet> {
   }
 
   static const _fadeOutOptions = [
-    _FadeOption_(label: '바로 종료', subtitle: '타이머 종료 즉시 정지', seconds: 0),
-    _FadeOption_(label: '30초 페이드아웃', subtitle: '짧고 자연스러운 종료', seconds: 30),
-    _FadeOption_(label: '1분 페이드아웃', subtitle: '기본 추천값', seconds: 60),
-    _FadeOption_(label: '3분 페이드아웃', subtitle: '민감한 사용자용', seconds: 180),
+    _FadeOptionData(label: '바로 종료', subtitle: '타이머 종료 즉시 정지', seconds: 0),
+    _FadeOptionData(label: '30초 페이드아웃', subtitle: '짧고 자연스러운 종료', seconds: 30),
+    _FadeOptionData(label: '1분 페이드아웃', subtitle: '기본 추천값', seconds: 60),
+    _FadeOptionData(label: '3분 페이드아웃', subtitle: '민감한 사용자용', seconds: 180),
   ];
 }
 
-class _FadeOption_ {
-  const _FadeOption_({
+class _FadeOptionData {
+  const _FadeOptionData({
     required this.label,
     required this.subtitle,
     required this.seconds,

@@ -6,6 +6,7 @@ import '../../data/models/sound_model.dart';
 import '../../services/audio_service.dart';
 import '../../services/timer_service.dart';
 import '../../services/preferences_service.dart';
+import '../../services/ad_service.dart';
 import '../sleep_screen/sleep_screen.dart';
 import 'widgets/timer_picker_sheet.dart';
 import 'widgets/circular_timer.dart';
@@ -22,22 +23,37 @@ class PlayerScreen extends ConsumerStatefulWidget {
 class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Timer? _sleepScreenTimer;
   bool _isPlaying = false;
+  bool _isLocked = false; // 잠금 사운드 해제 여부
 
   @override
   void initState() {
     super.initState();
-    _startPlayback();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    _checkLockAndPlay();
   }
 
-  Future<void> _startPlayback() async {
+  Future<void> _checkLockAndPlay() async {
+    final prefs = await ref.read(preferencesServiceProvider.future);
+    final sound = widget.sound;
+
+    // 무료 사운드이거나 이미 해제된 경우 바로 재생
+    if (sound.isFree ||
+        prefs.isAdRemoved() ||
+        prefs.isSoundUnlocked(sound.id)) {
+      await _startPlayback(prefs);
+    } else {
+      // 잠금 사운드 — 해제 필요
+      setState(() => _isLocked = true);
+    }
+  }
+
+  Future<void> _startPlayback(PreferencesService prefs) async {
+    if (!mounted) return;
     final audioService = ref.read(audioPlayerServiceProvider);
     await audioService.play(widget.sound);
     if (mounted) setState(() => _isPlaying = true);
 
-    final prefs = await ref.read(preferencesServiceProvider.future);
     await prefs.addRecentPlayed(widget.sound.id);
-
     _scheduleSleepScreen(prefs.getSleepScreenDelay());
   }
 
@@ -76,36 +92,46 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 32),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            ref.read(timerNotifierProvider.notifier).cancel();
+            Navigator.pop(context);
+          },
         ),
         actions: [
           _FavoriteButton(soundId: widget.sound.id),
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              _SoundHeader(sound: widget.sound, lang: lang),
-              const SizedBox(height: 48),
-              Expanded(
-                child: CircularTimer(timerState: timerState),
+        child: _isLocked
+            ? _LockedView(sound: widget.sound, onUnlocked: _onUnlocked)
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    _SoundHeader(sound: widget.sound, lang: lang),
+                    const SizedBox(height: 48),
+                    Expanded(child: CircularTimer(timerState: timerState)),
+                    const SizedBox(height: 32),
+                    _Controls(
+                      isPlaying: _isPlaying,
+                      timerState: timerState,
+                      onPlayPause: _togglePlayPause,
+                      onStop: _stop,
+                      onTimerTap: _showTimerPicker,
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                ),
               ),
-              const SizedBox(height: 32),
-              _Controls(
-                isPlaying: _isPlaying,
-                timerState: timerState,
-                onPlayPause: _togglePlayPause,
-                onTimerTap: _showTimerPicker,
-              ),
-              const SizedBox(height: 32),
-            ],
-          ),
-        ),
       ),
     );
+  }
+
+  Future<void> _onUnlocked() async {
+    setState(() => _isLocked = false);
+    final prefs = await ref.read(preferencesServiceProvider.future);
+    await _startPlayback(prefs);
   }
 
   Future<void> _togglePlayPause() async {
@@ -129,6 +155,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     setState(() => _isPlaying = !_isPlaying);
   }
 
+  Future<void> _stop() async {
+    _sleepScreenTimer?.cancel();
+    ref.read(timerNotifierProvider.notifier).cancel();
+    await ref.read(audioPlayerServiceProvider).stop();
+    if (mounted) {
+      setState(() => _isPlaying = false);
+      Navigator.pop(context);
+    }
+  }
+
   void _showTimerPicker() async {
     final prefs = await ref.read(preferencesServiceProvider.future);
     if (!mounted) return;
@@ -136,6 +172,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (_) => TimerPickerSheet(
         onConfirm: (minutes, fadeOut) {
           ref.read(timerNotifierProvider.notifier).start(
@@ -146,6 +183,74 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         initialMinutes: prefs.getDefaultTimer(),
         initialFadeOut: prefs.getDefaultFadeOut(),
       ),
+    );
+  }
+}
+
+// 잠금 해제 화면 (광고 보기 또는 프리미엄)
+class _LockedView extends ConsumerWidget {
+  const _LockedView({required this.sound, required this.onUnlocked});
+
+  final SoundModel sound;
+  final Future<void> Function() onUnlocked;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = Localizations.localeOf(context).languageCode;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.lock_rounded, size: 56, color: Colors.white38),
+            const SizedBox(height: 20),
+            Text(
+              sound.nameFor(lang),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              sound.isAdUnlock
+                  ? '광고 1회 시청으로 24시간 무료 이용'
+                  : '프리미엄 사운드입니다',
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            if (sound.isAdUnlock)
+              FilledButton.icon(
+                icon: const Icon(Icons.ondemand_video_rounded),
+                label: const Text('광고 보고 듣기'),
+                onPressed: () => _watchAd(context, ref),
+              ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('돌아가기', style: TextStyle(color: Colors.white38)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _watchAd(BuildContext context, WidgetRef ref) async {
+    final adService = ref.read(adServiceProvider);
+    final prefs = await ref.read(preferencesServiceProvider.future);
+    if (!context.mounted) return;
+
+    await adService.showRewardedAd(
+      context: context,
+      onRewarded: () async {
+        await prefs.unlockSound(sound.id);
+        await onUnlocked();
+      },
     );
   }
 }
@@ -208,42 +313,37 @@ class _Controls extends StatelessWidget {
     required this.isPlaying,
     required this.timerState,
     required this.onPlayPause,
+    required this.onStop,
     required this.onTimerTap,
   });
 
   final bool isPlaying;
   final TimerState timerState;
   final VoidCallback onPlayPause;
+  final VoidCallback onStop;
   final VoidCallback onTimerTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Timer button
-            _ControlButton(
-              icon: Icons.timer_outlined,
-              label: timerState.isRunning
-                  ? _formatDuration(timerState.remaining)
-                  : '타이머',
-              onTap: onTimerTap,
-              isActive: timerState.isRunning,
-            ),
-            const SizedBox(width: 24),
-            // Play/Pause
-            _PlayButton(isPlaying: isPlaying, onTap: onPlayPause),
-            const SizedBox(width: 24),
-            // Stop
-            _ControlButton(
-              icon: Icons.stop_rounded,
-              label: '정지',
-              onTap: () {}, // handled by parent
-              isActive: false,
-            ),
-          ],
+        _ControlButton(
+          icon: Icons.timer_outlined,
+          label: timerState.isRunning
+              ? _formatDuration(timerState.remaining)
+              : '타이머',
+          onTap: onTimerTap,
+          isActive: timerState.isRunning,
+        ),
+        const SizedBox(width: 24),
+        _PlayButton(isPlaying: isPlaying, onTap: onPlayPause),
+        const SizedBox(width: 24),
+        _ControlButton(
+          icon: Icons.stop_rounded,
+          label: '정지',
+          onTap: onStop,
+          isActive: false,
         ),
       ],
     );
@@ -324,18 +424,14 @@ class _ControlButton extends StatelessWidget {
             child: Icon(
               icon,
               size: 24,
-              color: isActive
-                  ? const Color(0xFF6B8CFF)
-                  : Colors.white54,
+              color: isActive ? const Color(0xFF6B8CFF) : Colors.white54,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
-              color: isActive
-                  ? const Color(0xFF6B8CFF)
-                  : Colors.white38,
+              color: isActive ? const Color(0xFF6B8CFF) : Colors.white38,
               fontSize: 11,
             ),
           ),
