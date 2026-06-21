@@ -27,6 +27,7 @@ import com.hunnychiko.baekbunuil.ui.theme.*
 fun TopBar(
     ticketCount: Int,
     bestStreak: Int,
+    hasUnread: Boolean = false,
     onNotificationClick: () -> Unit = {}
 ) {
     Row(
@@ -47,8 +48,14 @@ fun TopBar(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             StatChip(icon = "🎫", value = "$ticketCount")
             StatChip(icon = "👑", value = "$bestStreak")
-            IconButton(onClick = onNotificationClick, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.Notifications, contentDescription = "알림", tint = TextSecondary)
+            BadgedBox(
+                badge = {
+                    if (hasUnread) Badge(containerColor = Primary)
+                }
+            ) {
+                IconButton(onClick = onNotificationClick, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.Notifications, contentDescription = "알림", tint = TextSecondary)
+                }
             }
         }
     }
@@ -57,7 +64,7 @@ fun TopBar(
 @Composable
 fun StatChip(icon: String, value: String) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(10.dp),
         color = CardBackgroundLight
     ) {
         Row(
@@ -85,7 +92,7 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = CardBackground)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -138,7 +145,7 @@ fun HeroProductCard(product: ProductRoom, myCurrentStreak: Int = 0, onClick: () 
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = CardBackground)
     ) {
         Box(
@@ -184,7 +191,7 @@ fun HeroProductCard(product: ProductRoom, myCurrentStreak: Int = 0, onClick: () 
                     onClick = onClick,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(6.dp)
                 ) {
                     Text("도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                 }
@@ -280,7 +287,7 @@ fun productEmoji(name: String): String = when {
 fun TicketBadge(count: Int, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(10.dp),
         color = Primary.copy(alpha = 0.2f),
         border = BorderStroke(1.dp, Primary.copy(alpha = 0.5f))
     ) {

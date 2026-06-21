@@ -103,7 +103,7 @@ fun TicketScreen(
         ) {
             // 현재 도전 상황 카드
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -139,7 +139,7 @@ fun TicketScreen(
 
             // 광고 시청 카드
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -149,7 +149,7 @@ fun TicketScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             color = Secondary.copy(alpha = 0.2f)
                         ) {
                             Text("▶", modifier = Modifier.padding(12.dp), fontSize = 24.sp)
@@ -193,7 +193,7 @@ fun TicketScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (todayAdCount >= MAX_DAILY_ADS) SurfaceVariant else Primary
                         ),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(7.dp),
                         enabled = todayAdCount < MAX_DAILY_ADS
                     ) {
                         if (isAdLoading) {
@@ -219,7 +219,7 @@ fun TicketScreen(
 
             // 오늘 보상 현황
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -251,7 +251,7 @@ fun TicketScreen(
 
             // 맞춤형 광고 설정
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -300,7 +300,7 @@ fun TicketScreen(
                     Image(
                         painter = painterResource(R.drawable.anim_ticket_earned),
                         contentDescription = "승부권 획득",
-                        modifier = Modifier.size(160.dp).clip(RoundedCornerShape(20.dp))
+                        modifier = Modifier.size(160.dp).clip(RoundedCornerShape(10.dp))
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(

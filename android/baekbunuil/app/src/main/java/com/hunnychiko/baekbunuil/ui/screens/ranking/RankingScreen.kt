@@ -25,7 +25,11 @@ import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 import com.hunnychiko.baekbunuil.viewmodel.RankingEntry
 
 @Composable
-fun RankingScreen(viewModel: AppViewModel) {
+fun RankingScreen(
+    viewModel: AppViewModel,
+    onNotificationClick: () -> Unit = {},
+    hasUnread: Boolean = false
+) {
     val user by viewModel.user.collectAsState()
     val rankings by viewModel.rankings.collectAsState()
     val isLoading by viewModel.isRankingLoading.collectAsState()
@@ -39,7 +43,7 @@ fun RankingScreen(viewModel: AppViewModel) {
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
-            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0)
+            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0, hasUnread = hasUnread, onNotificationClick = onNotificationClick)
         }
 
         item {
@@ -146,7 +150,7 @@ private fun MyRankCard(rank: Int?, nickname: String, bestStreak: Int, totalWins:
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground
     ) {
         Box(

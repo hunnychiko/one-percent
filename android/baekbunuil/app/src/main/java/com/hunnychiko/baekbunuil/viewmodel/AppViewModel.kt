@@ -3,6 +3,8 @@ package com.hunnychiko.baekbunuil.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.hunnychiko.baekbunuil.data.NotificationStore
+import com.hunnychiko.baekbunuil.data.UserPreferences
 import com.hunnychiko.baekbunuil.data.model.*
 import com.hunnychiko.baekbunuil.data.repository.GameRepository
 import kotlinx.coroutines.delay
@@ -98,7 +100,17 @@ class AppViewModel : ViewModel() {
     private val _inviteMessage = MutableStateFlow<String?>(null)
     val inviteMessage: StateFlow<String?> = _inviteMessage
 
+    private val _notifications = MutableStateFlow<List<AppNotification>>(emptyList())
+    val notifications: StateFlow<List<AppNotification>> = _notifications
+
+    val unreadNotificationCount: StateFlow<Int> = _notifications
+        .map { list -> list.count { !it.isRead } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), 0)
+
     init {
+        viewModelScope.launch {
+            NotificationStore.notifications.collect { _notifications.value = it }
+        }
         if (repo.isSignedIn()) {
             loadUser()
             loadProducts()
@@ -111,7 +123,7 @@ class AppViewModel : ViewModel() {
             try {
                 val uid = repo.signInAnonymously()
                 val user = repo.getOrCreateUser(uid, "도전자_${uid.takeLast(4)}")
-                _user.value = user
+                _user.value = user?.copy(avatarId = UserPreferences.avatarId)
                 loadProducts()
                 loadTodayAdCount(uid)
                 registerFcmToken(uid)
@@ -130,7 +142,7 @@ class AppViewModel : ViewModel() {
             try {
                 val uid = repo.signInWithGoogle(idToken)
                 val user = repo.getOrCreateUser(uid, "유저_${uid.takeLast(4)}")
-                _user.value = user
+                _user.value = user?.copy(avatarId = UserPreferences.avatarId)
                 loadProducts()
                 loadTodayAdCount(uid)
                 registerFcmToken(uid)
@@ -155,7 +167,9 @@ class AppViewModel : ViewModel() {
     private fun loadUser() {
         viewModelScope.launch {
             try {
-                repo.observeUser(repo.currentUserId).collect { _user.value = it }
+                repo.observeUser(repo.currentUserId).collect { user ->
+                    _user.value = user?.copy(avatarId = UserPreferences.avatarId)
+                }
             } catch (e: Exception) {
                 _error.value = e.message
             }
@@ -423,6 +437,16 @@ class AppViewModel : ViewModel() {
             _currentClaim.value = claim
             onSuccess()
         }
+    }
+
+    fun markNotificationsRead() {
+        NotificationStore.markAllRead()
+    }
+
+    fun updateAvatar(avatarId: Int, photoUri: String = "") {
+        UserPreferences.avatarId = avatarId
+        if (photoUri.isNotEmpty()) UserPreferences.photoUri = photoUri
+        _user.value = _user.value?.copy(avatarId = avatarId)
     }
 
     fun clearError() { _error.value = null }

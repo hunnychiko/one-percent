@@ -76,7 +76,7 @@ fun AffiliateBannerSection(viewModel: AppViewModel) {
                 .padding(horizontal = 20.dp, vertical = 4.dp)
         ) {
             Surface(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 color = if (msg.startsWith("🎉")) Primary else CardBackgroundLight,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -96,7 +96,7 @@ private fun AffiliateBannerCard(banner: AffiliateBanner, onClick: () -> Unit) {
         modifier = Modifier
             .width(220.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground
     ) {
         Box {
@@ -131,7 +131,7 @@ private fun AffiliateBannerCard(banner: AffiliateBanner, onClick: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = Primary
             ) {
                 Text(

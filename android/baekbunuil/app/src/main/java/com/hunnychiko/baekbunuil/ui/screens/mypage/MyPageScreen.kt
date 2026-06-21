@@ -1,5 +1,9 @@
 package com.hunnychiko.baekbunuil.ui.screens.mypage
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +16,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.hunnychiko.baekbunuil.R
+import com.hunnychiko.baekbunuil.data.UserPreferences
 import com.hunnychiko.baekbunuil.ui.components.TicketBadge
 import com.hunnychiko.baekbunuil.ui.theme.*
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
@@ -32,6 +42,19 @@ fun MyPageScreen(
     val winHistory by viewModel.winHistory.collectAsState()
     var showSignOutDialog by remember { mutableStateOf(false) }
     var adConsent by remember { mutableStateOf(user?.adConsent ?: false) }
+    var showAvatarSheet by remember { mutableStateOf(false) }
+    var selectedAvatarId by remember { mutableStateOf(UserPreferences.avatarId) }
+    var selectedPhotoUri by remember {
+        mutableStateOf<Uri?>(UserPreferences.photoUri.takeIf { it.isNotEmpty() }?.let { Uri.parse(it) })
+    }
+
+    val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            selectedPhotoUri = uri
+            selectedAvatarId = 5
+            viewModel.updateAvatar(5, uri.toString())
+        }
+    }
 
     LaunchedEffect(Unit) { viewModel.loadHistory() }
 
@@ -54,24 +77,60 @@ fun MyPageScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // 프로필 카드
-            Surface(shape = RoundedCornerShape(20.dp), color = CardBackground) {
+            Surface(shape = RoundedCornerShape(10.dp), color = CardBackground) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = Primary.copy(alpha = 0.2f),
-                        modifier = Modifier.size(72.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clickable { showAvatarSheet = true },
+                        contentAlignment = Alignment.BottomEnd
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text("👤", fontSize = 36.sp)
+                        Surface(
+                            shape = CircleShape,
+                            color = Primary.copy(alpha = 0.2f),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            when {
+                                selectedAvatarId == 5 && selectedPhotoUri != null -> {
+                                    AsyncImage(
+                                        model = selectedPhotoUri,
+                                        contentDescription = "프로필 사진",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize().clip(CircleShape)
+                                    )
+                                }
+                                selectedAvatarId in 1..4 -> {
+                                    Image(
+                                        painter = painterResource(avatarResId(selectedAvatarId)),
+                                        contentDescription = "아바타",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                                else -> {
+                                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                        Text("👤", fontSize = 36.sp)
+                                    }
+                                }
+                            }
+                        }
+                        Surface(
+                            shape = CircleShape,
+                            color = Primary,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.Edit, contentDescription = "변경", tint = TextPrimary, modifier = Modifier.size(12.dp))
+                            }
                         }
                     }
                     Spacer(Modifier.height(12.dp))
@@ -170,7 +229,7 @@ fun MyPageScreen(
             Button(
                 onClick = onInvite,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
                 Icon(Icons.Default.PersonAdd, contentDescription = "친구 초대", modifier = Modifier.size(20.dp))
@@ -188,13 +247,81 @@ fun MyPageScreen(
             OutlinedButton(
                 onClick = { showSignOutDialog = true },
                 modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Error),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Error.copy(alpha = 0.5f))
             ) {
                 Icon(Icons.Default.Logout, contentDescription = "로그아웃", tint = Error, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("로그아웃", style = MaterialTheme.typography.titleMedium.copy(color = Error))
+            }
+        }
+    }
+
+    if (showAvatarSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAvatarSheet = false },
+            containerColor = CardBackground
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text("프로필 캐릭터 선택", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    for (id in 1..4) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clickable {
+                                    selectedAvatarId = id
+                                    selectedPhotoUri = null
+                                    viewModel.updateAvatar(id)
+                                    showAvatarSheet = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = if (selectedAvatarId == id) Primary.copy(alpha = 0.25f) else CardBackgroundLight,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Image(
+                                    painter = painterResource(avatarResId(id)),
+                                    contentDescription = "캐릭터 $id",
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                            if (selectedAvatarId == id) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = Primary,
+                                    modifier = Modifier.align(Alignment.BottomEnd).size(18.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Default.Check, null, tint = TextPrimary, modifier = Modifier.size(10.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = {
+                        photoLauncher.launch("image/*")
+                        showAvatarSheet = false
+                    },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Icon(Icons.Default.Photo, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("사진 앨범에서 선택")
+                }
+                Spacer(Modifier.height(32.dp))
             }
         }
     }
@@ -223,9 +350,17 @@ fun MyPageScreen(
     }
 }
 
+private fun avatarResId(id: Int) = when (id) {
+    1 -> R.drawable.ic_avatar_1
+    2 -> R.drawable.ic_avatar_2
+    3 -> R.drawable.ic_avatar_3
+    4 -> R.drawable.ic_avatar_4
+    else -> R.drawable.ic_avatar_1
+}
+
 @Composable
 private fun StatCard(modifier: Modifier = Modifier, emoji: String, value: String, label: String) {
-    Surface(modifier = modifier, shape = RoundedCornerShape(16.dp), color = CardBackground) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(8.dp), color = CardBackground) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -240,7 +375,7 @@ private fun StatCard(modifier: Modifier = Modifier, emoji: String, value: String
 
 @Composable
 private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(shape = RoundedCornerShape(16.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
+    Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium.copy(color = Primary))
             Spacer(Modifier.height(12.dp))
@@ -274,7 +409,7 @@ private fun ChallengeHistoryItem(productName: String, streak: Int, target: Int, 
             }
         }
         if (isCompleted) {
-            Surface(shape = RoundedCornerShape(8.dp), color = Success.copy(alpha = 0.2f)) {
+            Surface(shape = RoundedCornerShape(4.dp), color = Success.copy(alpha = 0.2f)) {
                 Text("참여 완료", modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelSmall.copy(color = Success))
             }
         }
@@ -296,7 +431,7 @@ private fun WinHistoryRow(productName: String, wonAt: String, onClaim: () -> Uni
             }
         }
         Surface(
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(5.dp),
             color = Gold.copy(alpha = 0.15f),
             modifier = Modifier.clickable(onClick = onClaim)
         ) {

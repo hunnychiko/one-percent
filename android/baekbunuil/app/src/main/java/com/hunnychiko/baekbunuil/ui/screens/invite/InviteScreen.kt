@@ -82,7 +82,7 @@ fun InviteScreen(
         ) {
             // 혜택 배너
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -122,7 +122,7 @@ fun InviteScreen(
 
             // 내 초대 코드
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -138,7 +138,7 @@ fun InviteScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(CardBackgroundLight, RoundedCornerShape(12.dp))
+                                .background(CardBackgroundLight, RoundedCornerShape(6.dp))
                                 .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -186,7 +186,7 @@ fun InviteScreen(
                                 context.startActivity(Intent.createChooser(intent, "초대 공유"))
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary)
                         ) {
                             Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -204,7 +204,7 @@ fun InviteScreen(
 
             // 초대 코드 입력
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -233,7 +233,7 @@ fun InviteScreen(
                                 ))
                             },
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Primary,
                                 unfocusedBorderColor = DividerColor,
@@ -253,7 +253,7 @@ fun InviteScreen(
                                 }
                             },
                             enabled = inputCode.length == 6,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
                             modifier = Modifier.height(56.dp)
                         ) {
@@ -275,7 +275,7 @@ fun InviteScreen(
 
             // 초대 혜택 안내
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackgroundLight,
                 modifier = Modifier.fillMaxWidth()
             ) {

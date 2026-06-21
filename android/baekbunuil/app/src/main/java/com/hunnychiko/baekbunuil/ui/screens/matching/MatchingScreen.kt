@@ -120,7 +120,7 @@ fun MatchingScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             Surface(
-                                shape = RoundedCornerShape(20.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 color = Primary.copy(alpha = 0.15f)
                             ) {
                                 Text(
@@ -137,7 +137,7 @@ fun MatchingScreen(
                         }
 
                         // 도전 상품 정보
-                        Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+                        Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                             Row(
                                 modifier = Modifier.padding(16.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -159,7 +159,7 @@ fun MatchingScreen(
                                 viewModel.cancelMatching()
                                 onCancel()
                             },
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(7.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
                             border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                         ) {
@@ -173,13 +173,13 @@ fun MatchingScreen(
                         Image(
                             painter = painterResource(R.drawable.anim_matching_found),
                             contentDescription = "매칭 완료",
-                            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp))
+                            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(8.dp))
                         )
                         Text(
                             "상대를 찾았습니다!",
                             style = MaterialTheme.typography.headlineLarge.copy(color = Primary, fontWeight = FontWeight.Black)
                         )
-                        Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+                        Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                             Column(
                                 modifier = Modifier.padding(20.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally

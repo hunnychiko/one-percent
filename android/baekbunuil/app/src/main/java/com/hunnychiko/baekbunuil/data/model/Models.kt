@@ -8,7 +8,8 @@ data class User(
     val ticketCount: Int = 0,
     val bestStreak: Int = 0,
     val totalWins: Int = 0,
-    val status: String = "active"
+    val status: String = "active",
+    val avatarId: Int = 0  // 0=default emoji, 1-4=preset, 5=photo
 )
 
 data class ProductRoom(
@@ -25,7 +26,19 @@ data class ProductRoom(
     // "coupon" = 쿠폰/제휴링크, "physical" = 실물 배송, "premium" = 고가 실물 (검증 필요)
     val productType: String = "coupon",
     // 도전 포기 시 직접 획득 가격 표시 (예: "₩9,900" / "티켓 30개" / "" = 비활성)
-    val directBuyLabel: String = ""
+    val directBuyLabel: String = "",
+    // "timestamp" = 기본 타임스탬프 추첨, "lotto" = 동행복권 API 결과 연동 (SS급)
+    val drawMethod: String = "timestamp"
+)
+
+data class AppNotification(
+    val id: String = "",
+    val title: String = "",
+    val body: String = "",
+    val type: String = "",
+    val roomId: String = "",
+    val createdAt: Long = 0L,
+    val isRead: Boolean = false
 )
 
 data class Challenge(

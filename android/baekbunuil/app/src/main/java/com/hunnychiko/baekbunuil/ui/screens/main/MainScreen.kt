@@ -33,9 +33,12 @@ fun MainScreen(
     onProductClick: (String) -> Unit,
     onSignOut: () -> Unit,
     onInvite: () -> Unit = {},
-    onClaim: (String) -> Unit = {}
+    onClaim: (String) -> Unit = {},
+    onNotificationClick: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(0) }
+    val hasUnread by viewModel.unreadNotificationCount.collectAsState()
+    val showBadge = hasUnread > 0
 
     Scaffold(
         containerColor = Background,
@@ -87,10 +90,10 @@ fun MainScreen(
                 label = "tab_animation"
             ) { tab ->
                 when (tab) {
-                    0 -> HomeContent(viewModel = viewModel, onProductClick = onProductClick)
-                    1 -> RankingScreen(viewModel = viewModel)
-                    2 -> GeneralTicketScreen(viewModel = viewModel, onProductClick = onProductClick)
-                    3 -> HistoryScreen(viewModel = viewModel, onProductClick = onProductClick)
+                    0 -> HomeContent(viewModel = viewModel, onProductClick = onProductClick, onNotificationClick = onNotificationClick, hasUnread = showBadge)
+                    1 -> RankingScreen(viewModel = viewModel, onNotificationClick = onNotificationClick, hasUnread = showBadge)
+                    2 -> GeneralTicketScreen(viewModel = viewModel, onProductClick = onProductClick, onNotificationClick = onNotificationClick, hasUnread = showBadge)
+                    3 -> HistoryScreen(viewModel = viewModel, onProductClick = onProductClick, onNotificationClick = onNotificationClick, hasUnread = showBadge)
                     4 -> MyPageScreen(
                         viewModel = viewModel,
                         onBack = { selectedTab = 0 },

@@ -33,7 +33,9 @@ import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 @Composable
 fun GeneralTicketScreen(
     viewModel: AppViewModel,
-    onProductClick: (String) -> Unit
+    onProductClick: (String) -> Unit,
+    onNotificationClick: () -> Unit = {},
+    hasUnread: Boolean = false
 ) {
     val user     by viewModel.user.collectAsState()
     val products by viewModel.products.collectAsState()
@@ -47,7 +49,7 @@ fun GeneralTicketScreen(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
-            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0)
+            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0, hasUnread = hasUnread, onNotificationClick = onNotificationClick)
         }
 
         item {
@@ -64,7 +66,7 @@ fun GeneralTicketScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = CardBackground
             ) {
                 Box(
@@ -141,7 +143,7 @@ fun GeneralTicketScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 4.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackgroundLight
             ) {
                 Row(
@@ -253,7 +255,7 @@ private fun TicketProductRow(product: ProductRoom, onClick: () -> Unit) {
     ) {
         // Emoji / image
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(6.dp),
             color = CardBackgroundLight,
             modifier = Modifier.size(52.dp)
         ) {
@@ -293,7 +295,7 @@ private fun TicketProductRow(product: ProductRoom, onClick: () -> Unit) {
         Spacer(Modifier.width(12.dp))
 
         Surface(
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(5.dp),
             color = Primary.copy(alpha = 0.15f)
         ) {
             Text(

@@ -20,7 +20,9 @@ import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 @Composable
 fun HomeContent(
     viewModel: AppViewModel,
-    onProductClick: (String) -> Unit
+    onProductClick: (String) -> Unit,
+    onNotificationClick: () -> Unit = {},
+    hasUnread: Boolean = false
 ) {
     val user by viewModel.user.collectAsState()
     val products by viewModel.products.collectAsState()
@@ -35,7 +37,9 @@ fun HomeContent(
         item {
             TopBar(
                 ticketCount = user?.ticketCount ?: 0,
-                bestStreak = user?.bestStreak ?: 0
+                bestStreak = user?.bestStreak ?: 0,
+                hasUnread = hasUnread,
+                onNotificationClick = onNotificationClick
             )
         }
 
@@ -95,7 +99,7 @@ fun CurrentChallengeBanner(streak: Int) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(7.dp),
         color = Primary.copy(alpha = 0.15f),
         border = BorderStroke(1.dp, Primary.copy(alpha = 0.4f))
     ) {

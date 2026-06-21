@@ -98,7 +98,7 @@ private fun WaitingForDraw(
     Image(
         painter = painterResource(R.drawable.anim_raffle_draw),
         contentDescription = "추첨 대기",
-        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp))
+        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(8.dp))
     )
     Text(
         "추첨 슬롯 입장 완료!",
@@ -109,7 +109,7 @@ private fun WaitingForDraw(
         style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary, textAlign = TextAlign.Center)
     )
 
-    Surface(shape = RoundedCornerShape(20.dp), color = CardBackground) {
+    Surface(shape = RoundedCornerShape(10.dp), color = CardBackground) {
         Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(productEmoji(product), fontSize = 56.sp)
             Spacer(Modifier.height(8.dp))
@@ -141,7 +141,7 @@ private fun WaitingForDraw(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(7.dp)
     ) {
         Text("다른 상품도 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
     }
@@ -155,7 +155,7 @@ private fun WinnerContent(
     Image(
         painter = painterResource(R.drawable.anim_raffle_win),
         contentDescription = "당첨",
-        modifier = Modifier.size(120.dp).clip(RoundedCornerShape(16.dp))
+        modifier = Modifier.size(120.dp).clip(RoundedCornerShape(8.dp))
     )
     Text(
         "당첨!",
@@ -166,7 +166,7 @@ private fun WinnerContent(
         style = MaterialTheme.typography.headlineSmall.copy(color = TextPrimary, textAlign = TextAlign.Center)
     )
 
-    Surface(shape = RoundedCornerShape(16.dp), color = Gold.copy(alpha = 0.15f)) {
+    Surface(shape = RoundedCornerShape(8.dp), color = Gold.copy(alpha = 0.15f)) {
         Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(productEmoji(product), fontSize = 48.sp)
             Spacer(Modifier.height(8.dp))
@@ -184,7 +184,7 @@ private fun WinnerContent(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Gold),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(7.dp)
     ) {
         Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = Background, fontWeight = FontWeight.Bold))
     }
@@ -205,7 +205,7 @@ private fun LoserContent(
         style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary, textAlign = TextAlign.Center)
     )
 
-    Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+    Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
         Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("다음 회차", style = MaterialTheme.typography.titleMedium.copy(color = Primary))
             Text(product.productName, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
@@ -221,7 +221,7 @@ private fun LoserContent(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(7.dp)
     ) {
         Text("다시 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
     }

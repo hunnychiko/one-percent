@@ -93,7 +93,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     .padding(horizontal = 32.dp)
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = if (pagerState.currentPage < pages.size - 1) "다음" else "시작하기",

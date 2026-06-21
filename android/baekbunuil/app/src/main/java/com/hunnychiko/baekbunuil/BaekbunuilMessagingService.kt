@@ -9,6 +9,8 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.hunnychiko.baekbunuil.data.NotificationStore
+import com.hunnychiko.baekbunuil.data.model.AppNotification
 
 class BaekbunuilMessagingService : FirebaseMessagingService() {
 
@@ -21,6 +23,18 @@ class BaekbunuilMessagingService : FirebaseMessagingService() {
         val title = message.notification?.title ?: return
         val body  = message.notification?.body  ?: return
         val type  = message.data["type"] ?: ""
+
+        NotificationStore.add(
+            AppNotification(
+                id = System.currentTimeMillis().toString(),
+                title = title,
+                body = body,
+                type = type,
+                roomId = message.data["roomId"] ?: "",
+                createdAt = System.currentTimeMillis(),
+                isRead = false
+            )
+        )
 
         createNotificationChannel()
 

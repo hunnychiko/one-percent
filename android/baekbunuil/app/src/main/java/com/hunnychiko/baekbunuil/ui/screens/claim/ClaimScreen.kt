@@ -77,7 +77,7 @@ fun ClaimScreen(
         ) {
             // 상품 헤더
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -126,7 +126,7 @@ fun ClaimScreen(
 
             claimMessage?.let {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = if (it.startsWith("배송")) Primary.copy(alpha = 0.2f) else Error.copy(alpha = 0.2f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -156,7 +156,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
     }
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -173,7 +173,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(CardBackgroundLight, RoundedCornerShape(12.dp))
+                        .background(CardBackgroundLight, RoundedCornerShape(6.dp))
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -212,7 +212,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
                         context.startActivity(intent)
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary)
                 ) {
                     Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -222,7 +222,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
             } else {
                 // 관리자가 아직 쿠폰 코드를 입력하지 않은 경우
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = CardBackgroundLight,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -278,7 +278,7 @@ private fun PremiumClaimSection(claim: WinnerClaim, viewModel: AppViewModel) {
 @Composable
 private fun VerificationPendingBanner() {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -302,7 +302,7 @@ private fun VerificationPendingBanner() {
             )
             Spacer(Modifier.height(16.dp))
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = Warning.copy(alpha = 0.15f)
             ) {
                 Text(
@@ -318,7 +318,7 @@ private fun VerificationPendingBanner() {
 @Composable
 private fun VerificationPassedBanner() {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = Success.copy(alpha = 0.15f),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -345,7 +345,7 @@ private fun VerificationPassedBanner() {
 @Composable
 private fun VerificationFailedBanner(note: String) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -369,7 +369,7 @@ private fun VerificationFailedBanner(note: String) {
             )
             if (note.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                Surface(shape = RoundedCornerShape(12.dp), color = CardBackgroundLight) {
+                Surface(shape = RoundedCornerShape(6.dp), color = CardBackgroundLight) {
                     Text(
                         "사유: $note",
                         modifier = Modifier.padding(12.dp),
@@ -396,7 +396,7 @@ private fun AddressInputForm(claim: WinnerClaim, viewModel: AppViewModel) {
     var submitting by remember { mutableStateOf(false) }
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -414,7 +414,7 @@ private fun AddressInputForm(claim: WinnerClaim, viewModel: AppViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)) },
                         singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(5.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Primary,
                             unfocusedBorderColor = DividerColor,
@@ -441,7 +441,7 @@ private fun AddressInputForm(claim: WinnerClaim, viewModel: AppViewModel) {
                     viewModel.submitShippingAddress(claim.claimId, name, phone, postcode, address, detail)
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 enabled = !submitting && name.isNotBlank() && phone.isNotBlank() && postcode.isNotBlank() && address.isNotBlank()
             ) {
@@ -470,7 +470,7 @@ private fun ShippingStatusCard(claim: WinnerClaim) {
     }
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {

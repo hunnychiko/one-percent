@@ -157,7 +157,7 @@ private fun ForfeitDialog(
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = Gold.copy(alpha = 0.15f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -196,7 +196,7 @@ private fun ForfeitDialog(
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Gold)
             ) {
                 Text(
@@ -258,7 +258,7 @@ private fun BattleSelectingContent(
         Spacer(Modifier.height(16.dp))
 
         // 도전 상품
-        Surface(shape = RoundedCornerShape(12.dp), color = CardBackground) {
+        Surface(shape = RoundedCornerShape(6.dp), color = CardBackground) {
             Row(
                 modifier = Modifier.padding(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -279,7 +279,7 @@ private fun BattleSelectingContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onForfeitTap),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground
             ) {
                 Box(
@@ -306,7 +306,7 @@ private fun BattleSelectingContent(
                             )
                         }
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(5.dp),
                             color = Gold.copy(alpha = 0.2f)
                         ) {
                             Text(
@@ -405,7 +405,7 @@ private fun BattleResultContent(
                 Image(
                     painter = painterResource(R.drawable.anim_streak_complete),
                     contentDescription = "연승 달성",
-                    modifier = Modifier.size(120.dp).clip(RoundedCornerShape(16.dp))
+                    modifier = Modifier.size(120.dp).clip(RoundedCornerShape(8.dp))
                 )
             } else {
                 Text(
@@ -437,7 +437,7 @@ private fun BattleResultContent(
             )
 
             // 선택 결과
-            Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+            Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                 Row(
                     modifier = Modifier.padding(24.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -458,7 +458,7 @@ private fun BattleResultContent(
             }
 
             // 연승 진행도
-            Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+            Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -487,7 +487,7 @@ private fun BattleResultContent(
             // 버튼
             if (isStreakComplete) {
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = Gold.copy(alpha = 0.15f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -501,7 +501,7 @@ private fun BattleResultContent(
                     onClick = onContinue,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("▶ 광고 보고 계속 도전", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold))
                 }
@@ -511,14 +511,14 @@ private fun BattleResultContent(
                         onClick = onContinue,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(7.dp)
                     ) {
                         Text("▶ 광고 보고 재도전", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                     }
                     OutlinedButton(
                         onClick = onHome,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(7.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                     ) {
                         Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
@@ -573,10 +573,10 @@ private fun RpsButton(choice: RpsChoice, onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .size(100.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(CardBackgroundLight)
             .clickable(onClick = onClick)
-            .border(2.dp, SurfaceVariant, RoundedCornerShape(20.dp))
+            .border(2.dp, SurfaceVariant, RoundedCornerShape(10.dp))
             .scale(scale),
         verticalArrangement = Arrangement.Center
     ) {
@@ -610,7 +610,7 @@ private fun CountdownCircle(countdown: Int) {
 
 @Composable
 private fun InfoChip(emoji: String, label: String) {
-    Surface(shape = RoundedCornerShape(20.dp), color = CardBackground) {
+    Surface(shape = RoundedCornerShape(10.dp), color = CardBackground) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,

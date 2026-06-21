@@ -84,7 +84,7 @@ fun ProductDetailScreen(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(16.dp),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(10.dp),
                     color = Primary
                 ) {
                     Text(
@@ -113,7 +113,7 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // 참여 현황 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("추첨방 현황", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(12.dp))
@@ -133,7 +133,7 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(16.dp))
 
                 // 연승 진행도 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -164,7 +164,7 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(16.dp))
 
                 // 규칙 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("참여 규칙", style = MaterialTheme.typography.titleMedium)
                         RuleItem("🎫", "승부권 1장 = 가위바위보 1회 대결")
@@ -184,7 +184,7 @@ fun ProductDetailScreen(
                             onClick = { /* 추첨 결과 화면으로 */ },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Success),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text("참여 완료 · 결과 기다리는 중 ✅", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                         }
@@ -194,7 +194,7 @@ fun ProductDetailScreen(
                             onClick = onChallenge,
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 if (isParticipating) "이어하기 ✊" else "도전하기 ✊",
@@ -205,7 +205,7 @@ fun ProductDetailScreen(
                     else -> {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(6.dp),
                                 color = Warning.copy(alpha = 0.15f),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -220,7 +220,7 @@ fun ProductDetailScreen(
                                 onClick = onWatchAd,
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                                shape = RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("▶ 광고 보고 승부권 받기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                             }

@@ -1,0 +1,334 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0E1117;
+  --card: #1A1F2E;
+  --card-light: #252A3A;
+  --primary: #6C63FF;
+  --primary-dim: rgba(108,99,255,0.15);
+  --text: #E8EAF0;
+  --text-sec: #8890A4;
+  --border: #2A2F3F;
+  --gold: #FFB300;
+  --error: #EF5350;
+  --success: #66BB6A;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ---------- 공통 ---------- */
+.hidden { display: none !important; }
+.view { min-height: 100vh; }
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sec);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn-ghost:hover { color: var(--text); }
+
+.btn-danger {
+  background: var(--error);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---------- 로그인 ---------- */
+#login-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--primary);
+  text-align: center;
+  letter-spacing: -1px;
+}
+
+.login-card h2 {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-sec);
+  font-weight: 400;
+}
+
+.login-card input {
+  background: var(--card-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+}
+.login-card input:focus { outline: none; border-color: var(--primary); }
+
+.error-msg { color: var(--error); font-size: 13px; text-align: center; min-height: 18px; }
+
+/* ---------- 레이아웃 ---------- */
+#admin-view {
+  display: grid;
+  grid-template-areas: "topbar topbar" "sidebar content";
+  grid-template-columns: 180px 1fr;
+  grid-template-rows: 52px 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-area: topbar;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.topbar-title { font-size: 18px; font-weight: 800; color: var(--primary); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-email { font-size: 13px; color: var(--text-sec); }
+
+.sidebar {
+  grid-area: sidebar;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-sec);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .15s;
+  width: 100%;
+}
+.nav-btn:hover, .nav-btn.active { background: var(--primary-dim); color: var(--primary); font-weight: 600; }
+
+.content {
+  grid-area: content;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-header h2 { font-size: 20px; }
+
+/* ---------- 상품 카드 그리드 ---------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.product-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.grade-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.grade-C  { background: rgba(76,175,80,.2);  color: #4CAF50; }
+.grade-B  { background: rgba(33,150,243,.2); color: #2196F3; }
+.grade-A  { background: rgba(156,39,176,.2); color: #9C27B0; }
+.grade-S  { background: rgba(255,152,0,.2);  color: #FF9800; }
+.grade-SS { background: rgba(233,30,99,.2);  color: #E91E63; }
+
+.product-card-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.product-card-desc { font-size: 12px; color: var(--text-sec); margin-bottom: 10px; }
+
+.progress-bar-wrap { margin-bottom: 10px; }
+.progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sec); margin-bottom: 4px; }
+.progress-bar { background: var(--card-light); border-radius: 3px; height: 5px; }
+.progress-fill { background: var(--primary); border-radius: 3px; height: 100%; transition: width .3s; }
+
+.product-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.status-open   { background: rgba(102,187,106,.2); color: var(--success); }
+.status-closed { background: rgba(239,83,80,.2);   color: var(--error); }
+.status-drawn  { background: rgba(255,179,0,.2);   color: var(--gold); }
+
+.card-actions { display: flex; gap: 6px; }
+.btn-sm {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card-light);
+  color: var(--text);
+  transition: all .15s;
+}
+.btn-sm:hover { border-color: var(--primary); color: var(--primary); }
+.btn-sm.danger:hover { border-color: var(--error); color: var(--error); }
+
+/* ---------- 테이블 ---------- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--text-sec); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+tr:hover td { background: var(--card-light); }
+
+/* ---------- 통계 ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-value { font-size: 32px; font-weight: 900; color: var(--primary); margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--text-sec); }
+
+/* ---------- 모달 ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-card.small { width: 360px; }
+
+.modal-card h3 { font-size: 18px; margin-bottom: 20px; }
+
+.form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-row label { font-size: 13px; color: var(--text-sec); }
+.form-row input, .form-row select {
+  background: var(--card-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 14px;
+}
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--primary); }
+
+.two-col { flex-direction: row; gap: 12px; }
+.two-col > div { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.two-col > div label { font-size: 13px; color: var(--text-sec); }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ---------- 토스트 ---------- */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-size: 14px;
+  z-index: 200;
+  animation: slide-in .2s ease;
+}
+@keyframes slide-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }

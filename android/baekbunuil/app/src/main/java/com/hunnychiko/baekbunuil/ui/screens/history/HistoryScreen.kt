@@ -28,7 +28,9 @@ import com.hunnychiko.baekbunuil.viewmodel.WinHistoryItem
 @Composable
 fun HistoryScreen(
     viewModel: AppViewModel,
-    onProductClick: (String) -> Unit
+    onProductClick: (String) -> Unit,
+    onNotificationClick: () -> Unit = {},
+    hasUnread: Boolean = false
 ) {
     val user by viewModel.user.collectAsState()
     val challengeHistory by viewModel.challengeHistory.collectAsState()
@@ -43,7 +45,7 @@ fun HistoryScreen(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
-            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0)
+            TopBar(ticketCount = user?.ticketCount ?: 0, bestStreak = user?.bestStreak ?: 0, hasUnread = hasUnread, onNotificationClick = onNotificationClick)
         }
         item {
             Text(
@@ -141,7 +143,7 @@ fun HistoryScreen(
 
 @Composable
 private fun SummaryCard(modifier: Modifier = Modifier, emoji: String, value: String, label: String) {
-    Surface(modifier = modifier, shape = RoundedCornerShape(14.dp), color = CardBackground) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(7.dp), color = CardBackground) {
         Column(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -186,7 +188,7 @@ private fun ChallengeHistoryCard(item: ChallengeHistoryItem, onClick: () -> Unit
             )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Surface(shape = RoundedCornerShape(8.dp), color = stateColor.copy(alpha = 0.15f)) {
+            Surface(shape = RoundedCornerShape(4.dp), color = stateColor.copy(alpha = 0.15f)) {
                 Text(
                     stateLabel,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -210,7 +212,7 @@ private fun WinHistoryCard(item: WinHistoryItem) {
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(Gold.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
+                .background(Gold.copy(alpha = 0.15f), RoundedCornerShape(6.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text("🏆", fontSize = 24.sp)

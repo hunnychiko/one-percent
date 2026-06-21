@@ -16,6 +16,7 @@ import com.hunnychiko.baekbunuil.ui.screens.invite.InviteScreen
 import com.hunnychiko.baekbunuil.ui.screens.main.MainScreen
 import com.hunnychiko.baekbunuil.ui.screens.matching.MatchingScreen
 import com.hunnychiko.baekbunuil.ui.screens.mypage.MyPageScreen
+import com.hunnychiko.baekbunuil.ui.screens.notifications.NotificationScreen
 import com.hunnychiko.baekbunuil.ui.screens.onboarding.OnboardingScreen
 import com.hunnychiko.baekbunuil.ui.screens.product.ProductDetailScreen
 import com.hunnychiko.baekbunuil.ui.screens.raffle.RaffleResultScreen
@@ -34,6 +35,7 @@ object Routes {
     const val MYPAGE = "mypage"
     const val INVITE = "invite"
     const val CLAIM = "claim/{roomId}"
+    const val NOTIFICATIONS = "notifications"
 
     fun productDetail(roomId: String) = "product/$roomId"
     fun claim(roomId: String) = "claim/$roomId"
@@ -71,7 +73,8 @@ fun AppNavigation(
                     navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } }
                 },
                 onInvite = { navController.navigate(Routes.INVITE) },
-                onClaim  = { roomId -> navController.navigate(Routes.claim(roomId)) }
+                onClaim  = { roomId -> navController.navigate(Routes.claim(roomId)) },
+                onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) }
             )
         }
         composable(
@@ -146,6 +149,12 @@ fun AppNavigation(
         }
         composable(Routes.INVITE) {
             InviteScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.NOTIFICATIONS) {
+            NotificationScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )

@@ -79,7 +79,7 @@ fun LoginScreen(
 
             // 슬로건 카드
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -110,7 +110,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = TextPrimary),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     "G  Google로 시작하기",
@@ -129,7 +129,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
                 border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant),
                 enabled = !isLoading
