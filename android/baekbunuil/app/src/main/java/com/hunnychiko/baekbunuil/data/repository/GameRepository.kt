@@ -435,6 +435,36 @@ class GameRepository {
         } catch (e: Exception) { false }
     }
 
+    suspend fun getDailyBonusConfig(): com.hunnychiko.baekbunuil.data.model.DailyBonusConfig {
+        return try {
+            val snap = db.getReference("config/dailyBonus").get().await()
+            snap.getValue(com.hunnychiko.baekbunuil.data.model.DailyBonusConfig::class.java)
+                ?: com.hunnychiko.baekbunuil.data.model.DailyBonusConfig()
+        } catch (_: Exception) {
+            com.hunnychiko.baekbunuil.data.model.DailyBonusConfig()
+        }
+    }
+
+    suspend fun getLastDailyBonusDate(userId: String): String {
+        return try {
+            db.getReference("users/$userId/lastDailyBonus").get().await()
+                .getValue(String::class.java) ?: ""
+        } catch (_: Exception) { "" }
+    }
+
+    suspend fun claimDailyBonus(userId: String, reward: Int): Boolean {
+        return try {
+            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val userRef = db.getReference("users/$userId")
+            val lastDate = userRef.child("lastDailyBonus").get().await()
+                .getValue(String::class.java) ?: ""
+            if (lastDate == today) return false
+            val current = userRef.child("ticketCount").get().await().getValue(Int::class.java) ?: 0
+            userRef.updateChildren(mapOf("ticketCount" to current + reward, "lastDailyBonus" to today)).await()
+            true
+        } catch (_: Exception) { false }
+    }
+
     fun isSignedIn() = auth.currentUser != null
     fun signOut() = auth.signOut()
 }

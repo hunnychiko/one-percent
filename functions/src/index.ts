@@ -263,6 +263,135 @@ export const applyInviteCode = functions.https.onCall(async (data) => {
 })
 
 // ─────────────────────────────────────────────
+// 7. 데일리 보너스 수령
+// ─────────────────────────────────────────────
+export const claimDailyBonus = functions.https.onCall(async (data) => {
+  const { userId } = data as { userId: string }
+  if (!userId) throw new functions.https.HttpsError('invalid-argument', 'userId 필수')
+
+  const today = new Date().toISOString().split('T')[0]
+
+  const configSnap = await db.ref('config/dailyBonus').once('value')
+  const config = configSnap.val() ?? { enabled: true, rewardTickets: 1, dday: '', ddayLabel: '' }
+
+  if (!config.enabled) {
+    throw new functions.https.HttpsError('unavailable', '데일리 보너스가 비활성화됐습니다')
+  }
+
+  const userSnap = await db.ref(`users/${userId}`).once('value')
+  const user = userSnap.val()
+  if (!user) throw new functions.https.HttpsError('not-found', '사용자 없음')
+  if (user.lastDailyBonus === today) {
+    throw new functions.https.HttpsError('already-exists', '오늘 이미 받았습니다')
+  }
+
+  await db.ref(`users/${userId}`).update({
+    ticketCount:    admin.database.ServerValue.increment(config.rewardTickets),
+    lastDailyBonus: today
+  })
+
+  return { success: true, reward: config.rewardTickets }
+})
+
+// ─────────────────────────────────────────────
+// 8. 동행복권 API 기반 SS급 추첨 (10번)
+// ─────────────────────────────────────────────
+export const executeLottoDraw = functions.https.onCall(async (data) => {
+  const { roomId } = data as { roomId: string }
+  if (!roomId) throw new functions.https.HttpsError('invalid-argument', 'roomId 필수')
+
+  const roomSnap = await db.ref(`productRooms/${roomId}`).once('value')
+  const room = roomSnap.val()
+  if (!room)                    throw new functions.https.HttpsError('not-found', '상품방 없음')
+  if (room.grade !== 'SS')      throw new functions.https.HttpsError('invalid-argument', 'SS급 전용 추첨 방식입니다')
+  if (room.drawStatus === 'drawn') throw new functions.https.HttpsError('already-exists', '이미 추첨됨')
+
+  const entriesSnap = await db.ref('drawEntries').orderByChild('roomId').equalTo(roomId).once('value')
+  const entries: Array<{ entryId: string; userId: string; roomId: string }> = []
+  entriesSnap.forEach(child => { entries.push(child.val()); return false })
+  if (entries.length === 0) throw new functions.https.HttpsError('failed-precondition', '참여자 없음')
+
+  // 동행복권 API에서 최신 당첨 번호 조회
+  let lottoSeed: string
+  try {
+    const https = await import('https')
+    const lottoData = await new Promise<string>((resolve, reject) => {
+      https.get('https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=latest', res => {
+        let body = ''
+        res.on('data', chunk => { body += chunk })
+        res.on('end', () => resolve(body))
+        res.on('error', reject)
+      })
+    })
+    const parsed = JSON.parse(lottoData)
+    const nums = [parsed.drwtNo1, parsed.drwtNo2, parsed.drwtNo3, parsed.drwtNo4, parsed.drwtNo5, parsed.drwtNo6, parsed.bnusNo]
+    lottoSeed = `lotto_${parsed.drwNo}_${nums.join(',')}`
+  } catch {
+    // API 실패 시 서버 난수 폴백
+    lottoSeed = `fallback_${Date.now()}_${crypto.randomBytes(16).toString('hex')}`
+  }
+
+  const seedHash  = crypto.createHash('sha256').update(lottoSeed).digest('hex')
+  const winnerIdx = parseInt(seedHash.slice(0, 8), 16) % entries.length
+  const winner    = entries[winnerIdx]
+
+  const userSnap       = await db.ref(`users/${winner.userId}`).once('value')
+  const winnerNickname = userSnap.val()?.nickname ?? '알 수 없음'
+  const drawId         = `lottodraw_${roomId}_${Date.now()}`
+
+  await Promise.all([
+    db.ref(`drawResults/${drawId}`).set({
+      drawId, roomId,
+      winnerUserId:    winner.userId,
+      winnerNickname,
+      seedHash,
+      lottoSeed,
+      totalEntries:    entries.length,
+      drawMethod:      'lotto',
+      drawnAt:         admin.database.ServerValue.TIMESTAMP
+    }),
+    db.ref(`productRooms/${roomId}`).update({ drawStatus: 'drawn' }),
+    db.ref(`winnerClaims/${drawId}`).set({
+      claimId:            drawId,
+      drawId,
+      roomId,
+      userId:             winner.userId,
+      productName:        room.productName,
+      productType:        room.productType ?? 'premium',
+      status:             'unclaimed',
+      couponCode:         '',
+      affiliateUrl:       '',
+      shippingName:       '',
+      shippingPhone:      '',
+      shippingPostcode:   '',
+      shippingAddress:    '',
+      shippingDetail:     '',
+      trackingNumber:     '',
+      trackingCarrier:    '',
+      verificationStatus: 'none',
+      verificationNote:   '',
+      createdAt:          admin.database.ServerValue.TIMESTAMP,
+      updatedAt:          admin.database.ServerValue.TIMESTAMP
+    })
+  ])
+
+  await sendToUser(winner.userId, {
+    title: '🎉 프리미엄찬스 당첨!',
+    body:  `${room.productName} 추첨에 당첨됐습니다! 마이페이지 → 수령하기를 눌러주세요.`,
+    data:  { type: 'draw_win', roomId, drawId }
+  })
+
+  return {
+    drawId,
+    winnerUserId:    winner.userId,
+    winnerNickname,
+    totalEntries:    entries.length,
+    lottoSeed,
+    seedHash
+  }
+})
+
+// ─────────────────────────────────────────────
 // Helper: FCM 메시지 발송
 // ─────────────────────────────────────────────
 async function sendToUser(

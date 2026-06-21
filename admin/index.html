@@ -34,6 +34,7 @@
     <button class="nav-btn active" data-section="products">상품 관리</button>
     <button class="nav-btn" data-section="draws">추첨 현황</button>
     <button class="nav-btn" data-section="users">사용자</button>
+    <button class="nav-btn" data-section="bonus">보너스 설정</button>
   </nav>
 
   <main class="content">
@@ -68,6 +69,38 @@
       </div>
       <div id="users-stats" class="stats-grid"></div>
     </section>
+
+    <!-- 보너스 설정 -->
+    <section id="section-bonus" class="section hidden">
+      <div class="section-header">
+        <h2>데일리 보너스 설정</h2>
+        <button id="save-bonus-btn" class="btn-primary">저장</button>
+      </div>
+      <div style="max-width:480px">
+        <div class="form-row" style="flex-direction:row;align-items:center;justify-content:space-between">
+          <label style="font-size:14px;color:var(--text)">데일리 보너스 활성화</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="bonus-enabled" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>기본 지급 승부권 수</label>
+          <input id="bonus-tickets" type="number" min="1" max="20" value="1" placeholder="1">
+        </div>
+        <div class="form-row">
+          <label>D-Day 날짜 (선택 · YYYY-MM-DD)</label>
+          <input id="bonus-dday" type="text" placeholder="예: 2026-07-01">
+        </div>
+        <div class="form-row">
+          <label>D-Day 배너 이름 (선택)</label>
+          <input id="bonus-dday-label" type="text" placeholder="예: 창립 기념 D-Day 보너스">
+        </div>
+        <p style="font-size:12px;color:var(--text-sec);margin-top:8px">
+          D-Day 날짜가 설정된 날에는 D-Day 배너와 이름이 표시됩니다. 비워두면 기본 데일리 보너스 모드로 동작합니다.
+        </p>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -88,11 +121,11 @@
       <div>
         <label>등급</label>
         <select id="f-grade">
-          <option value="C">C급 (3연승)</option>
-          <option value="B">B급 (5연승)</option>
-          <option value="A">A급 (7-10연승)</option>
-          <option value="S">S급 (10-15연승)</option>
-          <option value="SS">SS급 (15-20연승)</option>
+          <option value="C">데일리찬스 (3연승)</option>
+          <option value="B">위클리찬스 (5연승)</option>
+          <option value="A">프라임찬스 (7-10연승)</option>
+          <option value="S">스페셜찬스 (10-15연승)</option>
+          <option value="SS">프리미엄찬스 (15-20연승)</option>
         </select>
       </div>
       <div>

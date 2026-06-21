@@ -9,7 +9,15 @@ data class User(
     val bestStreak: Int = 0,
     val totalWins: Int = 0,
     val status: String = "active",
-    val avatarId: Int = 0  // 0=default emoji, 1-4=preset, 5=photo
+    val avatarId: Int = 0,
+    val lastDailyBonus: String = ""
+)
+
+data class DailyBonusConfig(
+    val enabled: Boolean = true,
+    val dday: String = "",
+    val ddayLabel: String = "",
+    val rewardTickets: Int = 1
 )
 
 data class ProductRoom(
@@ -141,11 +149,11 @@ data class WinnerClaim(
 )
 
 enum class ProductGrade(val label: String, val minStreak: Int, val maxStreak: Int, val color: Long) {
-    C("C급", 3, 3, 0xFF4CAF50),
-    B("B급", 5, 5, 0xFF2196F3),
-    A("A급", 7, 10, 0xFF9C27B0),
-    S("S급", 10, 15, 0xFFFF9800),
-    SS("SS급", 15, 20, 0xFFE91E63)
+    C("데일리찬스", 3, 3, 0xFF4CAF50),
+    B("위클리찬스", 5, 5, 0xFF2196F3),
+    A("프라임찬스", 7, 10, 0xFF9C27B0),
+    S("스페셜찬스", 10, 15, 0xFFFF9800),
+    SS("프리미엄찬스", 15, 20, 0xFFE91E63)
 }
 
 fun gradeFromStreak(streak: Int): ProductGrade = when {

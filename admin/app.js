@@ -62,6 +62,12 @@ const drawsTbody    = document.getElementById("draws-tbody");
 const usersStats    = document.getElementById("users-stats");
 const toast         = document.getElementById("toast");
 
+const bonusEnabled  = document.getElementById("bonus-enabled");
+const bonusTickets  = document.getElementById("bonus-tickets");
+const bonusDday     = document.getElementById("bonus-dday");
+const bonusDdayLabel = document.getElementById("bonus-dday-label");
+const saveBonusBtn  = document.getElementById("save-bonus-btn");
+
 let pendingDeleteId = null;
 let allProducts     = {};
 
@@ -82,6 +88,7 @@ onAuthStateChanged(auth, async (user) => {
   adminEmail.textContent = user.email;
   loadProducts();
   loadUserStats();
+  loadBonusConfig();
 });
 
 loginBtn.addEventListener("click", async () => {
@@ -115,6 +122,7 @@ navBtns.forEach(btn => {
       else s.classList.add("hidden");
     });
     if (target === "draws") renderDrawsTable();
+    if (target === "bonus") loadBonusConfig();
   });
 });
 
@@ -140,7 +148,7 @@ function renderProductCards() {
     card.className = "product-card";
     card.innerHTML = `
       <div class="product-card-header">
-        <span class="grade-badge grade-${p.grade}">${p.grade}급</span>
+        <span class="grade-badge grade-${p.grade}">${gradeLabel(p.grade)}</span>
         <span class="status-badge status-${p.drawStatus}">${p.drawStatus}</span>
       </div>
       <div class="product-card-name">${esc(p.productName)}</div>
@@ -288,10 +296,35 @@ function loadUserStats() {
   });
 }
 
+// ─── 보너스 설정 ─────────────────────────────────────────────────────────────
+function loadBonusConfig() {
+  get(ref(db, "config/dailyBonus")).then(snap => {
+    const cfg = snap.val() || {};
+    bonusEnabled.checked  = cfg.enabled  !== false;
+    bonusTickets.value    = cfg.rewardTickets ?? 1;
+    bonusDday.value       = cfg.dday ?? "";
+    bonusDdayLabel.value  = cfg.ddayLabel ?? "";
+  });
+}
+
+saveBonusBtn.addEventListener("click", async () => {
+  const payload = {
+    enabled:       bonusEnabled.checked,
+    rewardTickets: Number(bonusTickets.value) || 1,
+    dday:          bonusDday.value.trim(),
+    ddayLabel:     bonusDdayLabel.value.trim()
+  };
+  await set(ref(db, "config/dailyBonus"), payload);
+  showToast("보너스 설정이 저장됐습니다.");
+});
+
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
 function show(el) { el.classList.remove("hidden"); }
 function hide(el) { el.classList.add("hidden"); }
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gradeLabel(g) {
+  return { C:"데일리찬스", B:"위클리찬스", A:"프라임찬스", S:"스페셜찬스", SS:"프리미엄찬스" }[g] || g;
+}
 
 let toastTimer;
 function showToast(msg) {

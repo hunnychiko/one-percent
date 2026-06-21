@@ -108,6 +108,9 @@ fun BattleScreen(
                     onHome = {
                         viewModel.resetBattle()
                         onHome()
+                    },
+                    onRetryDraw = {
+                        viewModel.retryDraw(state.matchId, state.opponent, roomId)
                     }
                 )
             }
@@ -359,7 +362,9 @@ private fun BattleSelectingContent(
 @Composable
 private fun WaitingResultContent(state: BattleUiState.WaitingResult) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -369,6 +374,21 @@ private fun WaitingResultContent(state: BattleUiState.WaitingResult) {
         Text("상대방 선택 중...", style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary))
         Spacer(Modifier.height(24.dp))
         CircularProgressIndicator(color = Primary)
+        if (state.commitHash.isNotEmpty()) {
+            Spacer(Modifier.height(28.dp))
+            Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text("🔒 공정성 커밋", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "${state.commitHash.take(24)}...",
+                        style = MaterialTheme.typography.bodySmall.copy(color = Primary),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
+                    Text("결과 공개 후 시드로 검증 가능", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                }
+            }
+        }
     }
 }
 
@@ -377,7 +397,8 @@ private fun BattleResultContent(
     state: BattleUiState.Result,
     product: ProductRoom,
     onContinue: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onRetryDraw: () -> Unit = {}
 ) {
     val isWin = state.result == MatchResult.WIN
     val isDraw = state.result == MatchResult.DRAW
@@ -496,6 +517,30 @@ private fun BattleResultContent(
                         Text("${product.productName} 1/100 추첨 참여 완료!", style = MaterialTheme.typography.titleMedium.copy(color = Gold))
                     }
                 }
+            } else if (isDraw) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "무승부 재대결은 승부권을 소모하지 않습니다",
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, textAlign = TextAlign.Center),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Button(
+                        onClick = onRetryDraw,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        shape = RoundedCornerShape(7.dp)
+                    ) {
+                        Text("🤝 재대결하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
+                    }
+                    OutlinedButton(
+                        onClick = onHome,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(7.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
+                    ) {
+                        Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
+                    }
+                }
             } else if (isWin) {
                 Button(
                     onClick = onContinue,
@@ -522,6 +567,33 @@ private fun BattleResultContent(
                         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                     ) {
                         Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
+                    }
+                }
+            }
+            // 공정성 검증 카드
+            if (state.revealedSeed.isNotEmpty()) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text("🔍 공정성 검증", style = MaterialTheme.typography.titleSmall.copy(color = Primary))
+                        Spacer(Modifier.height(6.dp))
+                        Text("공개 시드", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                        Text(
+                            state.revealedSeed,
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextPrimary),
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text("커밋 해시 (SHA256)", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                        Text(
+                            state.commitHash,
+                            style = MaterialTheme.typography.bodySmall.copy(color = Primary),
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "검증: SHA256(시드|${state.opponentChoice.name}) = 커밋 해시",
+                            style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
+                        )
                     }
                 }
             }

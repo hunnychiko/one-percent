@@ -107,6 +107,12 @@ class AppViewModel : ViewModel() {
         .map { list -> list.count { !it.isRead } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), 0)
 
+    private val _dailyBonusAvailable = MutableStateFlow(false)
+    val dailyBonusAvailable: StateFlow<Boolean> = _dailyBonusAvailable
+
+    private val _dailyBonusConfig = MutableStateFlow<com.hunnychiko.baekbunuil.data.model.DailyBonusConfig?>(null)
+    val dailyBonusConfig: StateFlow<com.hunnychiko.baekbunuil.data.model.DailyBonusConfig?> = _dailyBonusConfig
+
     init {
         viewModelScope.launch {
             NotificationStore.notifications.collect { _notifications.value = it }
@@ -179,11 +185,20 @@ class AppViewModel : ViewModel() {
     private fun loadProducts() {
         viewModelScope.launch {
             try {
-                repo.observeProductRooms().collect { _products.value = it }
+                repo.observeProductRooms().collect { rooms ->
+                    _products.value = rooms.sortedWith(
+                        compareByDescending<ProductRoom> { gradeOrdinal(it.grade) }
+                            .thenByDescending { it.currentCount.toFloat() / it.capacity.coerceAtLeast(1) }
+                    )
+                }
             } catch (e: Exception) {
                 _products.value = sampleProducts
             }
         }
+    }
+
+    private fun gradeOrdinal(grade: String) = when (grade) {
+        "SS" -> 4; "S" -> 3; "A" -> 2; "B" -> 1; else -> 0
     }
 
     fun loadChallenge(roomId: String) {
@@ -245,13 +260,22 @@ class AppViewModel : ViewModel() {
     fun submitChoice(choice: RpsChoice, roomId: String) {
         val currentState = _battleState.value as? BattleUiState.Selecting ?: return
         viewModelScope.launch {
-            _battleState.value = BattleUiState.WaitingResult(currentState.matchId, currentState.opponent, choice)
-            delay(1000)
+            // Commit-reveal fairness: pre-commit opponent choice before revealing
             val opponentChoice = RpsChoice.entries.random()
+            val revealedSeed = java.util.UUID.randomUUID().toString()
+            val commitHash = sha256("$revealedSeed|${opponentChoice.name}")
+
+            _battleState.value = BattleUiState.WaitingResult(currentState.matchId, currentState.opponent, choice, commitHash)
+            delay(1200)
+
             val result = determineWinner(choice, opponentChoice)
-            val newStreak = if (result == MatchResult.WIN) {
-                (_currentChallenge.value?.currentStreak ?: 0) + 1
-            } else 0
+            val currentStreak = _currentChallenge.value?.currentStreak ?: 0
+            val newStreak = when (result) {
+                MatchResult.WIN -> currentStreak + 1
+                MatchResult.DRAW -> currentStreak
+                MatchResult.LOSE -> 0
+            }
+
             _battleState.value = BattleUiState.Result(
                 matchId = currentState.matchId,
                 opponent = currentState.opponent,
@@ -260,22 +284,38 @@ class AppViewModel : ViewModel() {
                 result = result,
                 newStreak = newStreak,
                 targetStreak = _currentChallenge.value?.targetStreak ?: 3,
-                roomId = roomId
+                roomId = roomId,
+                commitHash = commitHash,
+                revealedSeed = revealedSeed
             )
-            if (result == MatchResult.WIN) {
-                _currentChallenge.value = _currentChallenge.value?.copy(currentStreak = newStreak)
-                    ?: Challenge(currentStreak = newStreak)
-                _user.value = _user.value?.let { u ->
-                    u.copy(
-                        ticketCount = (u.ticketCount - 1).coerceAtLeast(0),
-                        bestStreak = maxOf(u.bestStreak, newStreak)
-                    )
+
+            when (result) {
+                MatchResult.WIN -> {
+                    _currentChallenge.value = _currentChallenge.value?.copy(currentStreak = newStreak)
+                        ?: Challenge(currentStreak = newStreak)
+                    _user.value = _user.value?.let { u ->
+                        u.copy(
+                            ticketCount = (u.ticketCount - 1).coerceAtLeast(0),
+                            bestStreak = maxOf(u.bestStreak, newStreak)
+                        )
+                    }
                 }
-            } else {
-                _currentChallenge.value = _currentChallenge.value?.copy(currentStreak = 0)
-                _user.value = _user.value?.copy(ticketCount = (_user.value?.ticketCount ?: 1) - 1)
+                MatchResult.DRAW -> { /* 무승부: 승부권 소모 없음, 연승 유지 */ }
+                MatchResult.LOSE -> {
+                    _currentChallenge.value = _currentChallenge.value?.copy(currentStreak = 0)
+                    _user.value = _user.value?.copy(ticketCount = (_user.value?.ticketCount ?: 1) - 1)
+                }
             }
         }
+    }
+
+    private fun sha256(input: String): String {
+        val bytes = java.security.MessageDigest.getInstance("SHA-256").digest(input.toByteArray())
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    fun retryDraw(matchId: String, opponent: Opponent, roomId: String) {
+        _battleState.value = BattleUiState.Selecting(matchId, opponent, roomId)
     }
 
     fun resetBattle() {
@@ -443,6 +483,39 @@ class AppViewModel : ViewModel() {
         NotificationStore.markAllRead()
     }
 
+    fun checkDailyBonus() {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            try {
+                val config = repo.getDailyBonusConfig()
+                _dailyBonusConfig.value = config
+                val lastDate = repo.getLastDailyBonusDate(uid)
+                val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                _dailyBonusAvailable.value = config.enabled && lastDate != today
+            } catch (_: Exception) { }
+        }
+    }
+
+    fun claimDailyBonus(onSuccess: (Int) -> Unit) {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            try {
+                val config = _dailyBonusConfig.value
+                val reward = config?.rewardTickets ?: 1
+                val success = repo.claimDailyBonus(uid, reward)
+                if (success) {
+                    _dailyBonusAvailable.value = false
+                    _user.value = _user.value?.copy(
+                        ticketCount = (_user.value?.ticketCount ?: 0) + reward
+                    )
+                    onSuccess(reward)
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
     fun updateAvatar(avatarId: Int, photoUri: String = "") {
         UserPreferences.avatarId = avatarId
         if (photoUri.isNotEmpty()) UserPreferences.photoUri = photoUri
@@ -472,7 +545,12 @@ sealed class MatchUiState {
 sealed class BattleUiState {
     object Waiting : BattleUiState()
     data class Selecting(val matchId: String, val opponent: Opponent, val roomId: String) : BattleUiState()
-    data class WaitingResult(val matchId: String, val opponent: Opponent, val myChoice: RpsChoice) : BattleUiState()
+    data class WaitingResult(
+        val matchId: String,
+        val opponent: Opponent,
+        val myChoice: RpsChoice,
+        val commitHash: String = ""
+    ) : BattleUiState()
     data class Result(
         val matchId: String,
         val opponent: Opponent,
@@ -481,6 +559,8 @@ sealed class BattleUiState {
         val result: MatchResult,
         val newStreak: Int,
         val targetStreak: Int,
-        val roomId: String
+        val roomId: String,
+        val commitHash: String = "",
+        val revealedSeed: String = ""
     ) : BattleUiState()
 }
