@@ -62,7 +62,7 @@ class GameRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.getValue(User::class.java)?.let { trySend(it) }
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -75,7 +75,7 @@ class GameRepository {
                 val rooms = snapshot.children.mapNotNull { it.getValue(ProductRoom::class.java) }
                 trySend(rooms.ifEmpty { sampleProducts })
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -87,7 +87,7 @@ class GameRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.getValue(ProductRoom::class.java))
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -99,7 +99,7 @@ class GameRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.getValue(Challenge::class.java))
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -165,7 +165,7 @@ class GameRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.getValue(Match::class.java))
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -298,7 +298,7 @@ class GameRepository {
                     .sortedBy { it.order }
                 trySend(banners)
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
@@ -374,7 +374,7 @@ class GameRepository {
                     .firstOrNull { it.roomId == roomId }
                 trySend(claim)
             }
-            override fun onCancelled(error: DatabaseError) = close(error.toException())
+            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }
         ref.addValueEventListener(listener)
         awaitClose { ref.removeEventListener(listener) }
