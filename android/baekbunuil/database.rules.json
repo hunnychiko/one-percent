@@ -1,0 +1,54 @@
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "productRooms": {
+      ".read": "auth !== null",
+      ".write": false
+    },
+    "challenges": {
+      "$challengeId": {
+        ".read": "auth !== null && $challengeId.contains(auth.uid)",
+        ".write": "auth !== null && $challengeId.contains(auth.uid)"
+      }
+    },
+    "matches": {
+      "$matchId": {
+        ".read": "auth !== null",
+        ".write": false
+      }
+    },
+    "matchQueue": {
+      "$roomId": {
+        "$userId": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid"
+        }
+      }
+    },
+    "drawEntries": {
+      "$roomId": {
+        "$userId": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid"
+        }
+      }
+    },
+    "drawResults": {
+      "$roomId": {
+        ".read": "auth !== null",
+        ".write": false
+      }
+    },
+    "adLogs": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": false
+      }
+    }
+  }
+}

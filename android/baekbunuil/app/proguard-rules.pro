@@ -1,0 +1,4 @@
+-keep class com.hunnychiko.baekbunuil.data.model.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn com.google.firebase.**
