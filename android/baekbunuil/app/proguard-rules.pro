@@ -2,3 +2,10 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -dontwarn com.google.firebase.**
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keepclassmembers class com.hunnychiko.baekbunuil.data.model.** { <init>(); <fields>; }
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-dontwarn androidx.compose.**
+-keep class com.google.android.play.core.** { *; }
