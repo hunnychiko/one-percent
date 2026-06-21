@@ -1,5 +1,6 @@
 package com.hunnychiko.baekbunuil.ui.screens.mypage
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -24,11 +25,15 @@ fun MyPageScreen(
     viewModel: AppViewModel,
     onBack: () -> Unit,
     onSignOut: () -> Unit,
-    onInvite: () -> Unit = {}
+    onInvite: () -> Unit = {},
+    onClaim: (String) -> Unit = {}
 ) {
     val user by viewModel.user.collectAsState()
+    val winHistory by viewModel.winHistory.collectAsState()
     var showSignOutDialog by remember { mutableStateOf(false) }
     var adConsent by remember { mutableStateOf(user?.adConsent ?: false) }
+
+    LaunchedEffect(Unit) { viewModel.loadHistory() }
 
     Scaffold(
         containerColor = Background,
@@ -118,7 +123,20 @@ fun MyPageScreen(
 
             // 당첨 기록
             SectionCard(title = "당첨 기록") {
-                EmptyState(message = "아직 당첨 기록이 없어요.\n목표 연승을 달성해 추첨에 참여하세요!")
+                if (winHistory.isEmpty()) {
+                    EmptyState(message = "아직 당첨 기록이 없어요.\n목표 연승을 달성해 추첨에 참여하세요!")
+                } else {
+                    winHistory.forEachIndexed { i, win ->
+                        WinHistoryRow(
+                            productName = win.productName,
+                            wonAt = win.wonAt,
+                            onClaim = { onClaim(win.roomId) }
+                        )
+                        if (i < winHistory.lastIndex) {
+                            HorizontalDivider(color = DividerColor, modifier = Modifier.padding(vertical = 8.dp))
+                        }
+                    }
+                }
             }
 
             // 광고/개인정보 설정
@@ -259,6 +277,34 @@ private fun ChallengeHistoryItem(productName: String, streak: Int, target: Int, 
             Surface(shape = RoundedCornerShape(8.dp), color = Success.copy(alpha = 0.2f)) {
                 Text("참여 완료", modifier = Modifier.padding(6.dp), style = MaterialTheme.typography.labelSmall.copy(color = Success))
             }
+        }
+    }
+}
+
+@Composable
+private fun WinHistoryRow(productName: String, wonAt: String, onClaim: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("🏆", fontSize = 18.sp)
+            Column {
+                Text(productName, style = MaterialTheme.typography.titleMedium)
+                Text(wonAt, style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary))
+            }
+        }
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = Gold.copy(alpha = 0.15f),
+            modifier = Modifier.clickable(onClick = onClaim)
+        ) {
+            Text(
+                "수령하기",
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.labelLarge.copy(color = Gold, fontWeight = FontWeight.Bold)
+            )
         }
     }
 }

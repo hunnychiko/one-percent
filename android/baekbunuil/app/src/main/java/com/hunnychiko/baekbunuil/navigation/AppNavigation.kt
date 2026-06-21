@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.hunnychiko.baekbunuil.ui.screens.auth.LoginScreen
 import com.hunnychiko.baekbunuil.ui.screens.battle.BattleScreen
+import com.hunnychiko.baekbunuil.ui.screens.claim.ClaimScreen
 import com.hunnychiko.baekbunuil.ui.screens.invite.InviteScreen
 import com.hunnychiko.baekbunuil.ui.screens.main.MainScreen
 import com.hunnychiko.baekbunuil.ui.screens.matching.MatchingScreen
@@ -32,8 +33,10 @@ object Routes {
     const val RAFFLE_RESULT = "raffle_result/{roomId}"
     const val MYPAGE = "mypage"
     const val INVITE = "invite"
+    const val CLAIM = "claim/{roomId}"
 
     fun productDetail(roomId: String) = "product/$roomId"
+    fun claim(roomId: String) = "claim/$roomId"
     fun ticket(roomId: String) = "ticket/$roomId"
     fun matching(roomId: String) = "matching/$roomId"
     fun battle(roomId: String) = "battle/$roomId"
@@ -67,7 +70,8 @@ fun AppNavigation(
                 onSignOut = {
                     navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } }
                 },
-                onInvite = { navController.navigate(Routes.INVITE) }
+                onInvite = { navController.navigate(Routes.INVITE) },
+                onClaim  = { roomId -> navController.navigate(Routes.claim(roomId)) }
             )
         }
         composable(
@@ -141,6 +145,17 @@ fun AppNavigation(
         }
         composable(Routes.INVITE) {
             InviteScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            Routes.CLAIM,
+            arguments = listOf(navArgument("roomId") { type = NavType.StringType })
+        ) { back ->
+            val roomId = back.arguments?.getString("roomId") ?: return@composable
+            ClaimScreen(
+                roomId = roomId,
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )

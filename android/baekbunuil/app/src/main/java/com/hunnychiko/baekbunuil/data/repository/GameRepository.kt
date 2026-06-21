@@ -129,15 +129,30 @@ class GameRepository {
         } catch (e: Exception) { 0 }
     }
 
-    suspend fun enterMatchQueue(userId: String, roomId: String): String {
-        val data = hashMapOf("userId" to userId, "roomId" to roomId)
+    // 연승 수 기준 매칭: matchQueue/$roomId/$streak/$userId
+    suspend fun enterMatchQueue(userId: String, roomId: String, streak: Int): String {
+        val data = hashMapOf("userId" to userId, "roomId" to roomId, "streak" to streak)
         return try {
             val result = functions.getHttpsCallable("enterMatchQueue").call(data).await()
             (result.data as? Map<*, *>)?.get("matchId") as? String ?: ""
         } catch (e: Exception) {
-            val matchId = "match_${System.currentTimeMillis()}"
-            db.getReference("matchQueue/$roomId/$userId").setValue(true).await()
-            matchId
+            val queueRef = db.getReference("matchQueue/$roomId/$streak")
+            val snapshot = queueRef.get().await()
+            val waiting = snapshot.children.firstOrNull { it.key != userId }
+            if (waiting != null) {
+                val opponentId = waiting.key ?: ""
+                val matchId = "match_${roomId}_s${streak}_${System.currentTimeMillis()}"
+                queueRef.child(opponentId).removeValue().await()
+                db.getReference("matches/$matchId").setValue(
+                    mapOf("matchId" to matchId, "player1" to opponentId, "player2" to userId,
+                        "roomId" to roomId, "streak" to streak)
+                ).await()
+                matchId
+            } else {
+                val matchId = "match_${System.currentTimeMillis()}"
+                queueRef.child(userId).setValue(System.currentTimeMillis()).await()
+                matchId
+            }
         }
     }
 
@@ -345,6 +360,76 @@ class GameRepository {
         val seed = userId.hashCode().toLong() + System.currentTimeMillis()
         val rng  = java.util.Random(seed)
         return (1..6).map { chars[rng.nextInt(chars.length)] }.joinToString("")
+    }
+
+    fun observeWinnerClaim(userId: String, roomId: String): Flow<WinnerClaim?> = callbackFlow {
+        val ref = db.getReference("winnerClaims").orderByChild("userId").equalTo(userId)
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val claim = snapshot.children
+                    .mapNotNull { it.getValue(WinnerClaim::class.java) }
+                    .firstOrNull { it.roomId == roomId }
+                trySend(claim)
+            }
+            override fun onCancelled(error: DatabaseError) = close(error.toException())
+        }
+        ref.addValueEventListener(listener)
+        awaitClose { ref.removeEventListener(listener) }
+    }
+
+    // 수령 신청 최초 생성 또는 기존 클레임 반환
+    suspend fun createOrGetClaim(
+        userId: String, roomId: String, productName: String, productType: String
+    ): WinnerClaim {
+        val ref = db.getReference("winnerClaims")
+        val existing = ref.orderByChild("userId").equalTo(userId).get().await()
+        val found = existing.children
+            .mapNotNull { it.getValue(WinnerClaim::class.java) }
+            .firstOrNull { it.roomId == roomId }
+        if (found != null) return found
+
+        val drawResult = db.getReference("drawResults/$roomId").get().await()
+            .getValue(DrawResult::class.java)
+        val claimId = ref.push().key ?: "claim_${System.currentTimeMillis()}"
+        val initialStatus = when (productType) {
+            "coupon"   -> "unclaimed"
+            "physical" -> "address_pending"
+            "premium"  -> "verifying"
+            else       -> "unclaimed"
+        }
+        val claim = WinnerClaim(
+            claimId     = claimId,
+            drawId      = drawResult?.drawId ?: "",
+            roomId      = roomId,
+            userId      = userId,
+            productName = productName,
+            productType = productType,
+            status      = initialStatus,
+            createdAt   = System.currentTimeMillis(),
+            updatedAt   = System.currentTimeMillis()
+        )
+        ref.child(claimId).setValue(claim).await()
+        return claim
+    }
+
+    suspend fun submitShippingAddress(
+        claimId: String,
+        name: String, phone: String,
+        postcode: String, address: String, detail: String
+    ): Boolean {
+        return try {
+            val updates = mapOf(
+                "shippingName"     to name,
+                "shippingPhone"    to phone,
+                "shippingPostcode" to postcode,
+                "shippingAddress"  to address,
+                "shippingDetail"   to detail,
+                "status"           to "address_submitted",
+                "updatedAt"        to System.currentTimeMillis()
+            )
+            db.getReference("winnerClaims/$claimId").updateChildren(updates).await()
+            true
+        } catch (e: Exception) { false }
     }
 
     fun isSignedIn() = auth.currentUser != null

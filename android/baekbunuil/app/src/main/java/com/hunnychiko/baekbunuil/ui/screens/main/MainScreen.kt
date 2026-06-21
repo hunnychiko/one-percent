@@ -32,7 +32,8 @@ fun MainScreen(
     viewModel: AppViewModel,
     onProductClick: (String) -> Unit,
     onSignOut: () -> Unit,
-    onInvite: () -> Unit = {}
+    onInvite: () -> Unit = {},
+    onClaim: (String) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -94,7 +95,8 @@ fun MainScreen(
                         viewModel = viewModel,
                         onBack = { selectedTab = 0 },
                         onSignOut = onSignOut,
-                        onInvite = onInvite
+                        onInvite = onInvite,
+                        onClaim = onClaim
                     )
                 }
             }

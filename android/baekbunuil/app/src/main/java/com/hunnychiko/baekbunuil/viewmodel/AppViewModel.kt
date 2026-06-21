@@ -87,6 +87,13 @@ class AppViewModel : ViewModel() {
     private val _affiliateRewardMessage = MutableStateFlow<String?>(null)
     val affiliateRewardMessage: StateFlow<String?> = _affiliateRewardMessage
 
+    // Winner claim
+    private val _currentClaim = MutableStateFlow<com.hunnychiko.baekbunuil.data.model.WinnerClaim?>(null)
+    val currentClaim: StateFlow<com.hunnychiko.baekbunuil.data.model.WinnerClaim?> = _currentClaim
+
+    private val _claimMessage = MutableStateFlow<String?>(null)
+    val claimMessage: StateFlow<String?> = _claimMessage
+
     // Invite
     private val _myInviteCode = MutableStateFlow<String?>(null)
     val myInviteCode: StateFlow<String?> = _myInviteCode
@@ -186,17 +193,16 @@ class AppViewModel : ViewModel() {
     }
 
     fun startMatching(roomId: String) {
+        val myStreak = _currentChallenge.value?.currentStreak ?: 0
         viewModelScope.launch {
             _matchState.value = MatchUiState.Searching
             try {
-                val matchId = repo.enterMatchQueue(repo.currentUserId, roomId)
-                // 실제 환경에서는 Firebase로 상대방을 기다림
-                // MVP에서는 5초 후 가상 상대와 매칭
+                val matchId = repo.enterMatchQueue(repo.currentUserId, roomId, myStreak)
                 delay(3000)
                 val opponent = Opponent(
                     userId = "bot_${System.currentTimeMillis()}",
                     nickname = listOf("우주탐험가", "별빛기사", "도전왕", "연승마스터").random(),
-                    currentStreak = (0..5).random(),
+                    currentStreak = myStreak,   // 동일 연승 수 상대와 매칭
                     avatarIndex = (0..9).random()
                 )
                 _matchState.value = MatchUiState.Found(matchId, opponent)
@@ -351,6 +357,48 @@ class AppViewModel : ViewModel() {
     }
 
     fun clearInviteMessage() { _inviteMessage.value = null }
+
+    fun loadWinnerClaim(roomId: String) {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            try {
+                repo.observeWinnerClaim(uid, roomId).collect { _currentClaim.value = it }
+            } catch (e: Exception) { }
+        }
+    }
+
+    fun initiateClaim(roomId: String) {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            val product = _products.value.find { it.roomId == roomId } ?: return@launch
+            val claim = repo.createOrGetClaim(uid, roomId, product.productName, product.productType)
+            _currentClaim.value = claim
+        }
+    }
+
+    fun submitShippingAddress(
+        claimId: String,
+        name: String, phone: String,
+        postcode: String, address: String, detail: String
+    ) {
+        viewModelScope.launch {
+            val ok = repo.submitShippingAddress(claimId, name, phone, postcode, address, detail)
+            if (ok) {
+                _currentClaim.value = _currentClaim.value?.copy(
+                    status = "address_submitted",
+                    shippingName = name, shippingPhone = phone,
+                    shippingPostcode = postcode, shippingAddress = address, shippingDetail = detail
+                )
+                _claimMessage.value = "배송지가 접수되었습니다. 운영자 검토 후 발송됩니다."
+            } else {
+                _claimMessage.value = "오류가 발생했습니다. 다시 시도해주세요."
+            }
+        }
+    }
+
+    fun clearClaimMessage() { _claimMessage.value = null }
 
     fun clearError() { _error.value = null }
 

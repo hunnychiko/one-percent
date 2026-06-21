@@ -38,7 +38,9 @@ fun MatchingScreen(
 ) {
     val matchState by viewModel.matchState.collectAsState()
     val products by viewModel.products.collectAsState()
+    val challenge by viewModel.currentChallenge.collectAsState()
     val product = products.find { it.roomId == roomId } ?: sampleProducts.first()
+    val myStreak = challenge?.currentStreak ?: 0
 
     var waitSeconds by remember { mutableStateOf(0) }
 
@@ -113,17 +115,24 @@ fun MatchingScreen(
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                "상대 찾는 중...",
+                                if (myStreak == 0) "상대 찾는 중..." else "${myStreak}연승 상대 찾는 중...",
                                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                             )
-                            Text(
-                                "곧 멋진 상대를 만나요!",
-                                style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary)
-                            )
+                            Spacer(Modifier.height(4.dp))
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = Primary.copy(alpha = 0.15f)
+                            ) {
+                                Text(
+                                    "연승 ${myStreak}인 상대와 매칭",
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                    style = MaterialTheme.typography.bodySmall.copy(color = Primary)
+                                )
+                            }
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 "예상 대기 시간 ${waitSeconds}초",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = Primary)
+                                style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
                             )
                         }
 
