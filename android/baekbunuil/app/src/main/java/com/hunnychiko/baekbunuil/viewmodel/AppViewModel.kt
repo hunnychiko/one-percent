@@ -68,35 +68,30 @@ class AppViewModel : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    // Ranking
     private val _rankings = MutableStateFlow<List<RankingEntry>>(emptyList())
     val rankings: StateFlow<List<RankingEntry>> = _rankings
 
     private val _isRankingLoading = MutableStateFlow(false)
     val isRankingLoading: StateFlow<Boolean> = _isRankingLoading
 
-    // History
     private val _challengeHistory = MutableStateFlow<List<ChallengeHistoryItem>>(emptyList())
     val challengeHistory: StateFlow<List<ChallengeHistoryItem>> = _challengeHistory
 
     private val _winHistory = MutableStateFlow<List<WinHistoryItem>>(emptyList())
     val winHistory: StateFlow<List<WinHistoryItem>> = _winHistory
 
-    // Affiliate banners
     private val _affiliateBanners = MutableStateFlow<List<com.hunnychiko.baekbunuil.data.model.AffiliateBanner>>(emptyList())
     val affiliateBanners: StateFlow<List<com.hunnychiko.baekbunuil.data.model.AffiliateBanner>> = _affiliateBanners
 
     private val _affiliateRewardMessage = MutableStateFlow<String?>(null)
     val affiliateRewardMessage: StateFlow<String?> = _affiliateRewardMessage
 
-    // Winner claim
     private val _currentClaim = MutableStateFlow<com.hunnychiko.baekbunuil.data.model.WinnerClaim?>(null)
     val currentClaim: StateFlow<com.hunnychiko.baekbunuil.data.model.WinnerClaim?> = _currentClaim
 
     private val _claimMessage = MutableStateFlow<String?>(null)
     val claimMessage: StateFlow<String?> = _claimMessage
 
-    // Invite
     private val _myInviteCode = MutableStateFlow<String?>(null)
     val myInviteCode: StateFlow<String?> = _myInviteCode
 
@@ -215,7 +210,7 @@ class AppViewModel : ViewModel() {
                 val opponent = Opponent(
                     userId = "bot_${System.currentTimeMillis()}",
                     nickname = listOf("우주탐험가", "별빛기사", "도전왕", "연승마스터").random(),
-                    currentStreak = myStreak,
+                    currentStreak = myStreak,   // 동일 연승 수 상대와 매칭
                     avatarIndex = (0..9).random()
                 )
                 _matchState.value = MatchUiState.Found(matchId, opponent)
@@ -413,14 +408,17 @@ class AppViewModel : ViewModel() {
 
     fun clearClaimMessage() { _claimMessage.value = null }
 
+    // 도전 포기 → 100% 직접 획득 처리 (결제 완료 후 호출)
     fun forfeitForGuaranteed(roomId: String, onSuccess: () -> Unit) {
         val uid = repo.currentUserId
         if (uid.isEmpty()) return
         viewModelScope.launch {
             val product = _products.value.find { it.roomId == roomId } ?: return@launch
+            // 채린지 초기화
             _currentChallenge.value = null
             _battleState.value = BattleUiState.Waiting
             _matchState.value = MatchUiState.Idle
+            // 클레임 생성 (guaranteed 상태로)
             val claim = repo.createOrGetClaim(uid, roomId, product.productName, product.productType)
             _currentClaim.value = claim
             onSuccess()

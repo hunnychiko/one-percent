@@ -111,6 +111,7 @@ class GameRepository {
             val result = functions.getHttpsCallable("claimAdReward").call(data).await()
             (result.data as? Map<*, *>)?.get("success") as? Boolean ?: false
         } catch (e: Exception) {
+            // Firebase Function 없을 때 로컈 처리
             val userRef = db.getReference("users/$userId")
             val snapshot = userRef.get().await()
             val user = snapshot.getValue(User::class.java) ?: return false
@@ -131,6 +132,7 @@ class GameRepository {
         } catch (e: Exception) { 0 }
     }
 
+    // 연승 수 기준 매칭: matchQueue/$roomId/$streak/$userId
     suspend fun enterMatchQueue(userId: String, roomId: String, streak: Int): String {
         val data = hashMapOf("userId" to userId, "roomId" to roomId, "streak" to streak)
         return try {
@@ -317,10 +319,12 @@ class GameRepository {
 
     suspend fun getOrCreateInviteCode(userId: String): String {
         val ref = db.getReference("inviteCodes")
+        // 기존 코드 검색
         val existing = ref.orderByChild("ownerUserId").equalTo(userId).get().await()
         if (existing.exists()) {
             return existing.children.first().getValue(InviteCode::class.java)?.code ?: generateCode(userId)
         }
+        // 신규 생성
         val code = generateCode(userId)
         val invite = InviteCode(
             code = code,
@@ -344,8 +348,10 @@ class GameRepository {
             if (usedRef.get().await().exists()) return "used"
             usedRef.setValue(code).await()
             codeRef.child("usedCount").setValue(invite.usedCount + 1).await()
+            // 초대받은 사람 티켓 +3
             val myTickets = db.getReference("users/$userId/ticketCount")
             myTickets.setValue((myTickets.get().await().getValue(Int::class.java) ?: 0) + 3).await()
+            // 초대한 사람 티켓 +3
             val ownerTickets = db.getReference("users/${invite.ownerUserId}/ticketCount")
             ownerTickets.setValue((ownerTickets.get().await().getValue(Int::class.java) ?: 0) + 3).await()
             "success"
@@ -374,6 +380,7 @@ class GameRepository {
         awaitClose { ref.removeEventListener(listener) }
     }
 
+    // 수령 신청 최초 생성 또는 기존 클레임 반환
     suspend fun createOrGetClaim(
         userId: String, roomId: String, productName: String, productType: String
     ): WinnerClaim {
