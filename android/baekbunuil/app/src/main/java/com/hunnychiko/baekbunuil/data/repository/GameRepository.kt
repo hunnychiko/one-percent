@@ -4,14 +4,21 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.functions.FirebaseFunctions
 import com.hunnychiko.baekbunuil.data.model.*
+import com.hunnychiko.baekbunuil.viewmodel.ChallengeHistoryItem
+import com.hunnychiko.baekbunuil.viewmodel.RankingEntry
+import com.hunnychiko.baekbunuil.viewmodel.WinHistoryItem
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -173,6 +180,93 @@ class GameRepository {
             val result = snapshot.getValue(DrawResult::class.java) ?: return null
             result.copy(isWinner = result.winnerUserId == userId)
         } catch (e: Exception) { null }
+    }
+
+    suspend fun getRankings(): List<RankingEntry> {
+        val snapshot = db.getReference("users")
+            .orderByChild("bestStreak")
+            .limitToLast(30)
+            .get()
+            .await()
+        return snapshot.children
+            .mapNotNull { child ->
+                val u = child.getValue(User::class.java) ?: return@mapNotNull null
+                RankingEntry(
+                    userId = u.userId,
+                    nickname = u.nickname,
+                    bestStreak = u.bestStreak,
+                    totalWins = u.totalWins
+                )
+            }
+            .sortedByDescending { it.bestStreak }
+            .mapIndexed { i, e -> e.copy(rank = i + 1) }
+    }
+
+    suspend fun getUserHistory(
+        userId: String,
+        products: List<ProductRoom>
+    ): Pair<List<ChallengeHistoryItem>, List<WinHistoryItem>> {
+        val dateFormat = SimpleDateFormat("yy.MM.dd", Locale.KOREA)
+
+        val challengeSnap = db.getReference("challenges")
+            .orderByChild("userId")
+            .equalTo(userId)
+            .get()
+            .await()
+
+        val challenges = challengeSnap.children.mapNotNull { child ->
+            val c = child.getValue(Challenge::class.java) ?: return@mapNotNull null
+            val product = products.find { it.roomId == c.roomId }
+            ChallengeHistoryItem(
+                challengeId = c.challengeId,
+                roomId      = c.roomId,
+                productName = product?.productName ?: c.roomId,
+                emoji       = productEmoji(product?.productName ?: ""),
+                currentStreak = c.currentStreak,
+                targetStreak  = c.targetStreak,
+                state         = c.state,
+                timeAgo       = ""
+            )
+        }.sortedByDescending { it.state == "active" }
+
+        val drawSnap = db.getReference("drawEntries")
+            .get()
+            .await()
+
+        val winHistory = mutableListOf<WinHistoryItem>()
+        drawSnap.children.forEach { roomNode ->
+            val roomId = roomNode.key ?: return@forEach
+            if (roomNode.child(userId).exists()) {
+                val resultSnap = db.getReference("drawResults/$roomId").get().await()
+                val result = resultSnap.getValue(DrawResult::class.java)
+                if (result != null && result.winnerUserId == userId) {
+                    val product = products.find { it.roomId == roomId }
+                    winHistory.add(
+                        WinHistoryItem(
+                            drawId      = result.drawId,
+                            roomId      = roomId,
+                            productName = product?.productName ?: roomId,
+                            round       = product?.round ?: 1,
+                            wonAt       = dateFormat.format(Date(result.drawnAt))
+                        )
+                    )
+                }
+            }
+        }
+
+        return challenges to winHistory.sortedByDescending { it.wonAt }
+    }
+
+    private fun productEmoji(name: String): String = when {
+        name.contains("청소기", ignoreCase = true) || name.contains("Roborock", ignoreCase = true) -> "🤖"
+        name.contains("이어폰", ignoreCase = true) || name.contains("AirPods", ignoreCase = true) || name.contains("Buds", ignoreCase = true) -> "🎧"
+        name.contains("치킨", ignoreCase = true) -> "🍗"
+        name.contains("커피", ignoreCase = true) -> "☕"
+        name.contains("아이스크림", ignoreCase = true) -> "🍦"
+        name.contains("영화", ignoreCase = true) -> "🎬"
+        name.contains("피자", ignoreCase = true) -> "🍕"
+        name.contains("공기청정", ignoreCase = true) || name.contains("다이슨", ignoreCase = true) -> "💨"
+        else -> "🎁"
     }
 
     fun isSignedIn() = auth.currentUser != null

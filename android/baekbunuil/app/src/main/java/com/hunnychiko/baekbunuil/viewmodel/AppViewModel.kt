@@ -7,6 +7,37 @@ import com.hunnychiko.baekbunuil.data.repository.GameRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
+
+data class RankingEntry(
+    val userId: String = "",
+    val nickname: String = "",
+    val bestStreak: Int = 0,
+    val totalWins: Int = 0,
+    val rank: Int = 0
+)
+
+data class ChallengeHistoryItem(
+    val challengeId: String = "",
+    val roomId: String = "",
+    val productName: String = "",
+    val emoji: String = "",
+    val currentStreak: Int = 0,
+    val targetStreak: Int = 3,
+    val state: String = "active",
+    val timeAgo: String = ""
+)
+
+data class WinHistoryItem(
+    val drawId: String = "",
+    val roomId: String = "",
+    val productName: String = "",
+    val round: Int = 1,
+    val wonAt: String = ""
+)
 
 class AppViewModel : ViewModel() {
     val repo = GameRepository()
@@ -34,6 +65,20 @@ class AppViewModel : ViewModel() {
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    // Ranking
+    private val _rankings = MutableStateFlow<List<RankingEntry>>(emptyList())
+    val rankings: StateFlow<List<RankingEntry>> = _rankings
+
+    private val _isRankingLoading = MutableStateFlow(false)
+    val isRankingLoading: StateFlow<Boolean> = _isRankingLoading
+
+    // History
+    private val _challengeHistory = MutableStateFlow<List<ChallengeHistoryItem>>(emptyList())
+    val challengeHistory: StateFlow<List<ChallengeHistoryItem>> = _challengeHistory
+
+    private val _winHistory = MutableStateFlow<List<WinHistoryItem>>(emptyList())
+    val winHistory: StateFlow<List<WinHistoryItem>> = _winHistory
 
     init {
         if (repo.isSignedIn()) {
@@ -203,6 +248,39 @@ class AppViewModel : ViewModel() {
         }
     }
 
+    fun loadRankings() {
+        if (_isRankingLoading.value) return
+        viewModelScope.launch {
+            _isRankingLoading.value = true
+            try {
+                val entries = repo.getRankings()
+                _rankings.value = entries
+            } catch (e: Exception) {
+                _rankings.value = listOf(
+                    RankingEntry("u1", "연승왕",   23, 5, 1),
+                    RankingEntry("u2", "행운아",   18, 3, 2),
+                    RankingEntry("u3", "도전자",   15, 2, 3),
+                    RankingEntry("u4", "승부사",   12, 1, 4),
+                    RankingEntry("u5", "럭키가이", 10, 1, 5),
+                )
+            } finally {
+                _isRankingLoading.value = false
+            }
+        }
+    }
+
+    fun loadHistory() {
+        val userId = repo.currentUserId
+        if (userId.isEmpty()) return
+        viewModelScope.launch {
+            try {
+                val (challenges, wins) = repo.getUserHistory(userId, _products.value)
+                _challengeHistory.value = challenges
+                _winHistory.value = wins
+            } catch (e: Exception) { }
+        }
+    }
+
     fun clearError() { _error.value = null }
 
     fun isSignedIn() = repo.isSignedIn()
@@ -211,6 +289,8 @@ class AppViewModel : ViewModel() {
         repo.signOut()
         _user.value = null
         _currentChallenge.value = null
+        _challengeHistory.value = emptyList()
+        _winHistory.value = emptyList()
     }
 }
 

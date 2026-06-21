@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.hunnychiko.baekbunuil.ui.screens.auth.LoginScreen
 import com.hunnychiko.baekbunuil.ui.screens.battle.BattleScreen
-import com.hunnychiko.baekbunuil.ui.screens.home.HomeScreen
+import com.hunnychiko.baekbunuil.ui.screens.main.MainScreen
 import com.hunnychiko.baekbunuil.ui.screens.matching.MatchingScreen
 import com.hunnychiko.baekbunuil.ui.screens.mypage.MyPageScreen
 import com.hunnychiko.baekbunuil.ui.screens.onboarding.OnboardingScreen
@@ -59,10 +59,12 @@ fun AppNavigation(
             )
         }
         composable(Routes.HOME) {
-            HomeScreen(
+            MainScreen(
                 viewModel = viewModel,
                 onProductClick = { roomId -> navController.navigate(Routes.productDetail(roomId)) },
-                onMyPageClick = { navController.navigate(Routes.MYPAGE) }
+                onSignOut = {
+                    navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } }
+                }
             )
         }
         composable(
