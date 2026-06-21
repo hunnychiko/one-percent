@@ -41,4 +41,18 @@ class SoundRepository {
     if (!doc.exists) return null;
     return SoundModel.fromFirestore(doc);
   }
+
+  Future<List<SoundModel>> getByCategories(List<String> categories) async {
+    final results = <SoundModel>[];
+    for (final cat in categories) {
+      final snap = await _sounds
+          .where('category', isEqualTo: cat)
+          .where('status', isEqualTo: SoundStatus.approved)
+          .orderBy('sortOrder')
+          .get();
+      results.addAll(snap.docs.map(SoundModel.fromFirestore));
+    }
+    results.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return results;
+  }
 }

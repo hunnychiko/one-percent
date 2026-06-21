@@ -7,7 +7,9 @@ import '../../services/audio_service.dart';
 import '../../services/timer_service.dart';
 import '../../services/preferences_service.dart';
 import '../../services/ad_service.dart';
+import '../../services/ambient_layer_service.dart';
 import '../sleep_screen/sleep_screen.dart';
+import 'widgets/ambient_chip_bar.dart';
 import 'widgets/timer_picker_sheet.dart';
 import 'widgets/circular_timer.dart';
 
@@ -92,10 +94,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 32),
-          onPressed: () {
-            ref.read(timerNotifierProvider.notifier).cancel();
-            Navigator.pop(context);
-          },
+          onPressed: _handleBack,
         ),
         actions: [
           _FavoriteButton(soundId: widget.sound.id),
@@ -110,9 +109,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                   children: [
                     const SizedBox(height: 24),
                     _SoundHeader(sound: widget.sound, lang: lang),
-                    const SizedBox(height: 48),
-                    Expanded(child: CircularTimer(timerState: timerState)),
                     const SizedBox(height: 32),
+                    Expanded(child: CircularTimer(timerState: timerState)),
+                    const SizedBox(height: 24),
                     _Controls(
                       isPlaying: _isPlaying,
                       timerState: timerState,
@@ -120,12 +119,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       onStop: _stop,
                       onTimerTap: _showTimerPicker,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
+                    const AmbientChipBar(),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
       ),
     );
+  }
+
+  Future<void> _handleBack() async {
+    ref.read(timerNotifierProvider.notifier).cancel();
+    await ref.read(ambientLayerNotifierProvider.notifier).stopAll();
+    if (mounted) Navigator.pop(context);
   }
 
   Future<void> _onUnlocked() async {
@@ -136,12 +143,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   Future<void> _togglePlayPause() async {
     final audioService = ref.read(audioPlayerServiceProvider);
+    final ambientNotifier =
+        ref.read(ambientLayerNotifierProvider.notifier);
     if (_isPlaying) {
       await audioService.pause();
+      await ambientNotifier.pauseAll();
       _sleepScreenTimer?.cancel();
       ref.read(timerNotifierProvider.notifier).cancel();
     } else {
       await audioService.resume();
+      await ambientNotifier.resumeAll();
       final prefs = await ref.read(preferencesServiceProvider.future);
       _scheduleSleepScreen(prefs.getSleepScreenDelay());
       final timerState = ref.read(timerNotifierProvider);
@@ -158,6 +169,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Future<void> _stop() async {
     _sleepScreenTimer?.cancel();
     ref.read(timerNotifierProvider.notifier).cancel();
+    await ref.read(ambientLayerNotifierProvider.notifier).stopAll();
     await ref.read(audioPlayerServiceProvider).stop();
     if (mounted) {
       setState(() => _isPlaying = false);
