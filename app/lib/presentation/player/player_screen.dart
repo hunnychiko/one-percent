@@ -120,7 +120,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       onTimerTap: _showTimerPicker,
                     ),
                     const SizedBox(height: 20),
-                    const AmbientChipBar(),
+                    AmbientChipBar(currentSound: widget.sound),
                     const SizedBox(height: 24),
                   ],
                 ),
