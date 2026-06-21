@@ -26,6 +26,7 @@ import com.hunnychiko.baekbunuil.R
 import com.hunnychiko.baekbunuil.data.model.*
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
 import com.hunnychiko.baekbunuil.ui.components.StreakStars
+import com.hunnychiko.baekbunuil.ui.components.productEmoji
 import com.hunnychiko.baekbunuil.ui.theme.*
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 import com.hunnychiko.baekbunuil.viewmodel.BattleUiState
@@ -39,7 +40,8 @@ fun BattleScreen(
     viewModel: AppViewModel,
     onStreakComplete: () -> Unit,
     onContinue: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onForfeit: (String) -> Unit = {}
 ) {
     val battleState by viewModel.battleState.collectAsState()
     val products by viewModel.products.collectAsState()
@@ -48,6 +50,7 @@ fun BattleScreen(
 
     var countdown by remember { mutableStateOf(COUNTDOWN_SECONDS) }
     var autoSelected by remember { mutableStateOf(false) }
+    var showForfeitDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(battleState) {
         if (battleState is BattleUiState.Selecting) {
@@ -87,7 +90,8 @@ fun BattleScreen(
                     onChoiceSelected = { choice ->
                         autoSelected = true
                         viewModel.submitChoice(choice, roomId)
-                    }
+                    },
+                    onForfeitTap = { if (product.directBuyLabel.isNotEmpty()) showForfeitDialog = true }
                 )
             }
             is BattleUiState.WaitingResult -> {
@@ -114,6 +118,102 @@ fun BattleScreen(
             }
         }
     }
+
+    // 도전 포기 확인 다이얼로그
+    if (showForfeitDialog) {
+        ForfeitDialog(
+            product = product,
+            onConfirm = {
+                showForfeitDialog = false
+                viewModel.forfeitForGuaranteed(roomId) { onForfeit(roomId) }
+            },
+            onDismiss = { showForfeitDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun ForfeitDialog(
+    product: ProductRoom,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = CardBackground,
+        title = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text(productEmoji(product.productName), fontSize = 48.sp)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "도전을 포기하고\n상품을 바로 받을까요?",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center
+                    )
+                )
+            }
+        },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Gold.copy(alpha = 0.15f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("🎯 100% 획득 보장", style = MaterialTheme.typography.titleMedium.copy(color = Gold))
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            product.productName,
+                            style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            product.directBuyLabel,
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                color = Primary,
+                                fontWeight = FontWeight.Black
+                            )
+                        )
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "현재 진행 중인 대결은 취소되며\n연승 기록은 초기화됩니다.",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = TextSecondary,
+                        textAlign = TextAlign.Center
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Gold)
+            ) {
+                Text(
+                    "${product.directBuyLabel} 직접 획득하기",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = Background,
+                        fontWeight = FontWeight.Black
+                    )
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Text("계속 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
+            }
+        }
+    )
 }
 
 @Composable
@@ -122,7 +222,8 @@ private fun BattleSelectingContent(
     product: ProductRoom,
     currentStreak: Int,
     countdown: Int,
-    onChoiceSelected: (RpsChoice) -> Unit
+    onChoiceSelected: (RpsChoice) -> Unit,
+    onForfeitTap: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -171,7 +272,58 @@ private fun BattleSelectingContent(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        // 도전 포기 배너 (directBuyLabel 있을 때만 표시)
+        if (product.directBuyLabel.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onForfeitTap),
+                shape = RoundedCornerShape(16.dp),
+                color = CardBackground
+            ) {
+                Box(
+                    modifier = Modifier.background(
+                        Brush.horizontalGradient(
+                            listOf(Gold.copy(alpha = 0.15f), Primary.copy(alpha = 0.1f))
+                        )
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(productEmoji(product.productName), fontSize = 28.sp)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "지금 도전을 포기하시면",
+                                style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
+                            )
+                            Text(
+                                "해당 상품을 100% 획득 가능합니다",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = Gold.copy(alpha = 0.2f)
+                        ) {
+                            Text(
+                                product.directBuyLabel,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    color = Gold,
+                                    fontWeight = FontWeight.Black
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
 
         Text("당신의 선택을 해주세요", style = MaterialTheme.typography.headlineSmall.copy(textAlign = TextAlign.Center))
         Text("두 사람이 동시에 선택해야 승부가 시작됩니다", style = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center))

@@ -15,6 +15,8 @@ const EMPTY_FORM: Omit<ProductRoom, 'roomId' | 'currentCount' | 'drawStatus'> = 
   grade:          'C',
   description:    '',
   round:          1,
+  productType:    'coupon',
+  directBuyLabel: '',
 }
 
 export default function AdminProductsPage() {
@@ -79,6 +81,8 @@ export default function AdminProductsPage() {
       grade:          p.grade,
       description:    p.description,
       round:          p.round,
+      productType:    p.productType ?? 'coupon',
+      directBuyLabel: p.directBuyLabel ?? '',
     })
   }
 
@@ -161,6 +165,30 @@ export default function AdminProductsPage() {
                 className="w-full bg-card-lt text-white text-sm px-3 py-2 rounded-xl border border-transparent focus:border-primary outline-none"
                 value={form.round}
                 onChange={(e) => setForm((f) => ({ ...f, round: Number(e.target.value) }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">상품 유형</label>
+              <select
+                className="w-full bg-card-lt text-white text-sm px-3 py-2 rounded-xl border border-transparent focus:border-primary outline-none"
+                value={form.productType}
+                onChange={(e) => setForm((f) => ({ ...f, productType: e.target.value as 'coupon' | 'physical' | 'premium' }))}
+              >
+                <option value="coupon">쿠폰/링크</option>
+                <option value="physical">실물 배송</option>
+                <option value="premium">고가 실물</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">도전 포기 직구 가격</label>
+              <input
+                className="w-full bg-card-lt text-white text-sm px-3 py-2 rounded-xl border border-transparent focus:border-primary outline-none"
+                value={form.directBuyLabel}
+                onChange={(e) => setForm((f) => ({ ...f, directBuyLabel: e.target.value }))}
+                placeholder="예: ₩9,900 (빈칸=비활성)"
               />
             </div>
           </div>

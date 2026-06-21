@@ -121,7 +121,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 onStreakComplete = { navController.navigate(Routes.raffleResult(roomId)) { popUpTo(Routes.HOME) } },
                 onContinue = { navController.navigate(Routes.ticket(roomId)) { popUpTo(Routes.battle(roomId)) { inclusive = true } } },
-                onHome = { navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } } }
+                onHome = { navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } } },
+                onForfeit = { id -> navController.navigate(Routes.claim(id)) { popUpTo(Routes.HOME) } }
             )
         }
         composable(

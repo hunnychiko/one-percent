@@ -400,6 +400,23 @@ class AppViewModel : ViewModel() {
 
     fun clearClaimMessage() { _claimMessage.value = null }
 
+    // 도전 포기 → 100% 직접 획득 처리 (결제 완료 후 호출)
+    fun forfeitForGuaranteed(roomId: String, onSuccess: () -> Unit) {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            val product = _products.value.find { it.roomId == roomId } ?: return@launch
+            // 챌린지 초기화
+            _currentChallenge.value = null
+            _battleState.value = BattleUiState.Waiting
+            _matchState.value = MatchUiState.Idle
+            // 클레임 생성 (guaranteed 상태로)
+            val claim = repo.createOrGetClaim(uid, roomId, product.productName, product.productType)
+            _currentClaim.value = claim
+            onSuccess()
+        }
+    }
+
     fun clearError() { _error.value = null }
 
     fun isSignedIn() = repo.isSignedIn()

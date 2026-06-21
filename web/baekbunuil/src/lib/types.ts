@@ -19,6 +19,8 @@ export interface ProductRoom {
   grade: 'C' | 'B' | 'A' | 'S' | 'SS'
   description: string
   round: number
+  productType?: 'coupon' | 'physical' | 'premium'
+  directBuyLabel?: string   // e.g. "₩9,900" — 빈 문자열이면 도전 포기 옵션 비활성
   createdAt?: number
 }
 

@@ -23,7 +23,9 @@ data class ProductRoom(
     val description: String = "",
     val round: Int = 1,
     // "coupon" = 쿠폰/제휴링크, "physical" = 실물 배송, "premium" = 고가 실물 (검증 필요)
-    val productType: String = "coupon"
+    val productType: String = "coupon",
+    // 도전 포기 시 직접 획득 가격 표시 (예: "₩9,900" / "티켓 30개" / "" = 비활성)
+    val directBuyLabel: String = ""
 )
 
 data class Challenge(
@@ -160,12 +162,12 @@ data class InviteCode(
 )
 
 val sampleProducts = listOf(
-    ProductRoom("room_1", "아이스크림 쿠폰", "", 3, 100, 42, "open", "C", "편의점 아이스크림 교환권", 1, "coupon"),
-    ProductRoom("room_2", "커피 쿠폰", "", 3, 100, 71, "open", "C", "스타벅스 아메리카노", 1, "coupon"),
-    ProductRoom("room_3", "치킨 1마리", "", 5, 100, 28, "open", "B", "BBQ 황금올리브 치킨", 1, "physical"),
-    ProductRoom("room_4", "영화 관람권 2매", "", 5, 100, 55, "open", "B", "CGV 주말 영화 2매", 1, "coupon"),
-    ProductRoom("room_5", "무선 이어폰", "", 7, 100, 19, "open", "A", "Galaxy Buds2 Pro", 1, "physical"),
-    ProductRoom("room_6", "로봇청소기 특가", "", 10, 100, 37, "open", "S", "Roborock S8 Pro Ultra", 1, "premium"),
-    ProductRoom("room_7", "에어팟 프로 2세대", "", 10, 100, 8, "open", "S", "Apple AirPods Pro 2", 1, "premium"),
-    ProductRoom("room_8", "프리미엄 공기청정기", "", 15, 100, 3, "open", "SS", "다이슨 공기청정기 한정 특가", 1, "premium"),
+    ProductRoom("room_1", "아이스크림 쿠폰", "", 3, 100, 42, "open", "C", "편의점 아이스크림 교환권", 1, "coupon", "₩1,500"),
+    ProductRoom("room_2", "커피 쿠폰", "", 3, 100, 71, "open", "C", "스타벅스 아메리카노", 1, "coupon", "₩4,500"),
+    ProductRoom("room_3", "치킨 1마리", "", 5, 100, 28, "open", "B", "BBQ 황금올리브 치킨", 1, "physical", "₩19,900"),
+    ProductRoom("room_4", "영화 관람권 2매", "", 5, 100, 55, "open", "B", "CGV 주말 영화 2매", 1, "coupon", "₩22,000"),
+    ProductRoom("room_5", "무선 이어폰", "", 7, 100, 19, "open", "A", "Galaxy Buds2 Pro", 1, "physical", "₩89,000"),
+    ProductRoom("room_6", "로봇청소기 특가", "", 10, 100, 37, "open", "S", "Roborock S8 Pro Ultra", 1, "premium", "₩590,000"),
+    ProductRoom("room_7", "에어팟 프로 2세대", "", 10, 100, 8, "open", "S", "Apple AirPods Pro 2", 1, "premium", "₩289,000"),
+    ProductRoom("room_8", "프리미엄 공기청정기", "", 15, 100, 3, "open", "SS", "다이슨 공기청정기 한정 특가", 1, "premium", "₩890,000"),
 )
