@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const LINKS = [
-  { href: '/admin',          label: '대시보드' },
-  { href: '/admin/products', label: '상품 관리' },
-  { href: '/admin/draws',    label: '추첨 관리' },
-  { href: '/admin/winners',  label: '당첨자 관리' },
+  { href: '/admin',              label: '대시보드' },
+  { href: '/admin/products',     label: '상품 관리' },
+  { href: '/admin/affiliate',    label: '제휴 배너' },
+  { href: '/admin/draws',        label: '추첨 관리' },
+  { href: '/admin/winners',      label: '당첨자 관리' },
 ]
 
 export function AdminSidebar() {

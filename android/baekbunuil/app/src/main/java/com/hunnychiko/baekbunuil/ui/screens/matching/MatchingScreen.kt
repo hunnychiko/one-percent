@@ -1,6 +1,7 @@
 package com.hunnychiko.baekbunuil.ui.screens.matching
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,14 +12,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hunnychiko.baekbunuil.R
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
 import com.hunnychiko.baekbunuil.ui.theme.*
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
@@ -157,7 +161,11 @@ fun MatchingScreen(
                     }
 
                     is MatchUiState.Found -> {
-                        Text("⚡", fontSize = 64.sp)
+                        Image(
+                            painter = painterResource(R.drawable.anim_matching_found),
+                            contentDescription = "매칭 완료",
+                            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp))
+                        )
                         Text(
                             "상대를 찾았습니다!",
                             style = MaterialTheme.typography.headlineLarge.copy(color = Primary, fontWeight = FontWeight.Black)

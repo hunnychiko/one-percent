@@ -26,6 +26,7 @@ import com.hunnychiko.baekbunuil.ui.components.GradeBadge
 import com.hunnychiko.baekbunuil.ui.components.ParticipantBar
 import com.hunnychiko.baekbunuil.ui.components.TopBar
 import com.hunnychiko.baekbunuil.ui.components.productEmoji
+import com.hunnychiko.baekbunuil.ui.screens.affiliate.AffiliateBannerSection
 import com.hunnychiko.baekbunuil.ui.theme.*
 import androidx.compose.ui.graphics.Color
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
@@ -128,6 +129,11 @@ fun GeneralTicketScreen(
                     }
                 }
             }
+        }
+
+        // 제휴 배너
+        item {
+            AffiliateBannerSection(viewModel)
         }
 
         // 광고 시청 안내

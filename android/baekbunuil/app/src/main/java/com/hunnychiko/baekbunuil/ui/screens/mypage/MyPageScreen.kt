@@ -23,7 +23,8 @@ import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 fun MyPageScreen(
     viewModel: AppViewModel,
     onBack: () -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    onInvite: () -> Unit = {}
 ) {
     val user by viewModel.user.collectAsState()
     var showSignOutDialog by remember { mutableStateOf(false) }
@@ -145,6 +146,18 @@ fun MyPageScreen(
                 Spacer(Modifier.height(12.dp))
                 SettingsItem(icon = Icons.Default.PrivacyTip, label = "개인정보처리방침", onClick = {})
                 SettingsItem(icon = Icons.Default.Article, label = "이용약관", onClick = {})
+            }
+
+            // 친구 초대
+            Button(
+                onClick = onInvite,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Primary)
+            ) {
+                Icon(Icons.Default.PersonAdd, contentDescription = "친구 초대", modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("친구 초대하고 도전권 받기", style = MaterialTheme.typography.titleMedium)
             }
 
             // 앱 정보

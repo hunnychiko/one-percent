@@ -31,7 +31,8 @@ private val tabs = listOf(
 fun MainScreen(
     viewModel: AppViewModel,
     onProductClick: (String) -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    onInvite: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -92,7 +93,8 @@ fun MainScreen(
                     4 -> MyPageScreen(
                         viewModel = viewModel,
                         onBack = { selectedTab = 0 },
-                        onSignOut = onSignOut
+                        onSignOut = onSignOut,
+                        onInvite = onInvite
                     )
                 }
             }

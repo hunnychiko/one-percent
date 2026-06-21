@@ -80,6 +80,20 @@ class AppViewModel : ViewModel() {
     private val _winHistory = MutableStateFlow<List<WinHistoryItem>>(emptyList())
     val winHistory: StateFlow<List<WinHistoryItem>> = _winHistory
 
+    // Affiliate banners
+    private val _affiliateBanners = MutableStateFlow<List<com.hunnychiko.baekbunuil.data.model.AffiliateBanner>>(emptyList())
+    val affiliateBanners: StateFlow<List<com.hunnychiko.baekbunuil.data.model.AffiliateBanner>> = _affiliateBanners
+
+    private val _affiliateRewardMessage = MutableStateFlow<String?>(null)
+    val affiliateRewardMessage: StateFlow<String?> = _affiliateRewardMessage
+
+    // Invite
+    private val _myInviteCode = MutableStateFlow<String?>(null)
+    val myInviteCode: StateFlow<String?> = _myInviteCode
+
+    private val _inviteMessage = MutableStateFlow<String?>(null)
+    val inviteMessage: StateFlow<String?> = _inviteMessage
+
     init {
         if (repo.isSignedIn()) {
             loadUser()
@@ -280,6 +294,63 @@ class AppViewModel : ViewModel() {
             } catch (e: Exception) { }
         }
     }
+
+    fun loadAffiliateBanners() {
+        viewModelScope.launch {
+            try {
+                repo.observeAffiliateBanners().collect { _affiliateBanners.value = it }
+            } catch (e: Exception) { }
+        }
+    }
+
+    fun claimAffiliateReward(bannerId: String) {
+        viewModelScope.launch {
+            val banner = _affiliateBanners.value.find { it.bannerId == bannerId } ?: return@launch
+            val uid = repo.currentUserId
+            if (uid.isEmpty()) return@launch
+            val success = repo.claimAffiliateReward(uid, bannerId, banner.ticketReward)
+            if (success) {
+                _user.value = _user.value?.copy(
+                    ticketCount = (_user.value?.ticketCount ?: 0) + banner.ticketReward
+                )
+                _affiliateRewardMessage.value = "🎉 ${banner.companyName} 제휴 보상으로 도전권 ${banner.ticketReward}개 획득!"
+            } else {
+                _affiliateRewardMessage.value = "이미 이 배너의 보상을 받았어요"
+            }
+        }
+    }
+
+    fun clearAffiliateMessage() { _affiliateRewardMessage.value = null }
+
+    fun loadMyInviteCode() {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            val code = repo.getOrCreateInviteCode(uid)
+            _myInviteCode.value = code
+        }
+    }
+
+    fun applyInviteCode(code: String) {
+        val uid = repo.currentUserId
+        if (uid.isEmpty()) return
+        viewModelScope.launch {
+            val result = repo.applyInviteCode(uid, code)
+            _inviteMessage.value = when (result) {
+                "success" -> "🎁 초대 코드 적용 완료! 도전권 3개 획득"
+                "self"    -> "자신의 초대 코드는 사용할 수 없어요"
+                "used"    -> "이미 사용한 초대 코드예요"
+                else      -> "유효하지 않은 초대 코드예요"
+            }
+            if (result == "success") {
+                _user.value = _user.value?.copy(
+                    ticketCount = (_user.value?.ticketCount ?: 0) + 3
+                )
+            }
+        }
+    }
+
+    fun clearInviteMessage() { _inviteMessage.value = null }
 
     fun clearError() { _error.value = null }
 

@@ -109,6 +109,24 @@ fun gradeFromStreak(streak: Int): ProductGrade = when {
     else -> ProductGrade.SS
 }
 
+data class AffiliateBanner(
+    val bannerId: String = "",
+    val companyName: String = "",
+    val imageUrl: String = "",
+    val ticketReward: Int = 10,
+    val isActive: Boolean = true,
+    val order: Int = 0,
+    val createdAt: Long = 0L
+)
+
+data class InviteCode(
+    val code: String = "",
+    val ownerUserId: String = "",
+    val usedCount: Int = 0,
+    val rewardPerInvite: Int = 3,
+    val createdAt: Long = 0L
+)
+
 val sampleProducts = listOf(
     ProductRoom("room_1", "아이스크림 쿠폰", "", 3, 100, 42, "open", "C", "편의점 아이스크림 교환권", 1),
     ProductRoom("room_2", "커피 쿠폰", "", 3, 100, 71, "open", "C", "스타벅스 아메리카노", 1),

@@ -11,6 +11,7 @@ import com.hunnychiko.baekbunuil.data.model.*
 import com.hunnychiko.baekbunuil.viewmodel.ChallengeHistoryItem
 import com.hunnychiko.baekbunuil.viewmodel.RankingEntry
 import com.hunnychiko.baekbunuil.viewmodel.WinHistoryItem
+import com.google.firebase.database.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -267,6 +268,83 @@ class GameRepository {
         name.contains("피자", ignoreCase = true) -> "🍕"
         name.contains("공기청정", ignoreCase = true) || name.contains("다이슨", ignoreCase = true) -> "💨"
         else -> "🎁"
+    }
+
+    fun observeAffiliateBanners(): Flow<List<AffiliateBanner>> = callbackFlow {
+        val ref = db.getReference("affiliateBanners")
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val banners = snapshot.children
+                    .mapNotNull { it.getValue(AffiliateBanner::class.java) }
+                    .filter { it.isActive }
+                    .sortedBy { it.order }
+                trySend(banners)
+            }
+            override fun onCancelled(error: DatabaseError) = close(error.toException())
+        }
+        ref.addValueEventListener(listener)
+        awaitClose { ref.removeEventListener(listener) }
+    }
+
+    suspend fun claimAffiliateReward(userId: String, bannerId: String, ticketReward: Int): Boolean {
+        return try {
+            val claimRef = db.getReference("affiliateClaims/$bannerId/$userId")
+            val snap = claimRef.get().await()
+            if (snap.exists()) return false
+            claimRef.setValue(System.currentTimeMillis()).await()
+            val userRef = db.getReference("users/$userId/ticketCount")
+            val current = userRef.get().await().getValue(Int::class.java) ?: 0
+            userRef.setValue(current + ticketReward).await()
+            true
+        } catch (e: Exception) { false }
+    }
+
+    suspend fun getOrCreateInviteCode(userId: String): String {
+        val ref = db.getReference("inviteCodes")
+        // 기존 코드 검색
+        val existing = ref.orderByChild("ownerUserId").equalTo(userId).get().await()
+        if (existing.exists()) {
+            return existing.children.first().getValue(InviteCode::class.java)?.code ?: generateCode(userId)
+        }
+        // 신규 생성
+        val code = generateCode(userId)
+        val invite = InviteCode(
+            code = code,
+            ownerUserId = userId,
+            usedCount = 0,
+            rewardPerInvite = 3,
+            createdAt = System.currentTimeMillis()
+        )
+        ref.child(code).setValue(invite).await()
+        return code
+    }
+
+    suspend fun applyInviteCode(userId: String, code: String): String {
+        return try {
+            val codeRef  = db.getReference("inviteCodes/$code")
+            val snap     = codeRef.get().await()
+            if (!snap.exists()) return "invalid"
+            val invite   = snap.getValue(InviteCode::class.java) ?: return "invalid"
+            if (invite.ownerUserId == userId) return "self"
+            val usedRef  = db.getReference("inviteUsed/$userId")
+            if (usedRef.get().await().exists()) return "used"
+            usedRef.setValue(code).await()
+            codeRef.child("usedCount").setValue(invite.usedCount + 1).await()
+            // 초대받은 사람 티켓 +3
+            val myTickets = db.getReference("users/$userId/ticketCount")
+            myTickets.setValue((myTickets.get().await().getValue(Int::class.java) ?: 0) + 3).await()
+            // 초대한 사람 티켓 +3
+            val ownerTickets = db.getReference("users/${invite.ownerUserId}/ticketCount")
+            ownerTickets.setValue((ownerTickets.get().await().getValue(Int::class.java) ?: 0) + 3).await()
+            "success"
+        } catch (e: Exception) { "error" }
+    }
+
+    private fun generateCode(userId: String): String {
+        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        val seed = userId.hashCode().toLong() + System.currentTimeMillis()
+        val rng  = java.util.Random(seed)
+        return (1..6).map { chars[rng.nextInt(chars.length)] }.joinToString("")
     }
 
     fun isSignedIn() = auth.currentUser != null

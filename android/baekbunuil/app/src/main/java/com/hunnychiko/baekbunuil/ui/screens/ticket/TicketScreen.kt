@@ -1,6 +1,7 @@
 package com.hunnychiko.baekbunuil.ui.screens.ticket
 
 import android.app.Activity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -19,11 +22,13 @@ import androidx.compose.ui.unit.sp
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.hunnychiko.baekbunuil.R
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
 import com.hunnychiko.baekbunuil.ui.components.StreakStars
 import com.hunnychiko.baekbunuil.ui.components.TicketBadge
 import com.hunnychiko.baekbunuil.ui.theme.*
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
+import kotlinx.coroutines.delay
 
 // 개발 테스트용 AdMob 보상형 광고 ID — 출시 전 실제 ID로 교체
 private const val REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
@@ -51,6 +56,14 @@ fun TicketScreen(
     var isAdLoading by remember { mutableStateOf(false) }
     var showMaxAdMessage by remember { mutableStateOf(false) }
     var adConsent by remember { mutableStateOf(user?.adConsent ?: false) }
+    var showTicketEarnedAnim by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showTicketEarnedAnim) {
+        if (showTicketEarnedAnim) {
+            delay(1800)
+            showTicketEarnedAnim = false
+        }
+    }
 
     // 광고 로드
     LaunchedEffect(Unit) {
@@ -81,10 +94,10 @@ fun TicketScreen(
             )
         }
     ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -157,7 +170,10 @@ fun TicketScreen(
                             if (ad != null && activity != null) {
                                 ad.show(activity) { _ ->
                                     viewModel.claimAdReward(
-                                        onSuccess = onAdComplete,
+                                        onSuccess = {
+                                            showTicketEarnedAnim = true
+                                            onAdComplete()
+                                        },
                                         onFail = {}
                                     )
                                 }
@@ -165,7 +181,10 @@ fun TicketScreen(
                             } else {
                                 // 테스트 환경: 광고 없이 보상 지급
                                 viewModel.claimAdReward(
-                                    onSuccess = onAdComplete,
+                                    onSuccess = {
+                                        showTicketEarnedAnim = true
+                                        onAdComplete()
+                                    },
                                     onFail = {}
                                 )
                             }
@@ -268,6 +287,30 @@ fun TicketScreen(
                 TrustBadge("🔒", "안전한 보상 지급")
             }
         }
+
+        // 승부권 획득 애니메이션 오버레이
+        if (showTicketEarnedAnim) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Background.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(
+                        painter = painterResource(R.drawable.anim_ticket_earned),
+                        contentDescription = "승부권 획득",
+                        modifier = Modifier.size(160.dp).clip(RoundedCornerShape(20.dp))
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "승부권 +1 획득!",
+                        style = MaterialTheme.typography.headlineMedium.copy(color = Primary, fontWeight = FontWeight.Black)
+                    )
+                }
+            }
+        }
+        } // Box
     }
 }
 

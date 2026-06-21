@@ -2,6 +2,7 @@ package com.hunnychiko.baekbunuil.ui.screens.battle
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,10 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hunnychiko.baekbunuil.R
 import com.hunnychiko.baekbunuil.data.model.*
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
 import com.hunnychiko.baekbunuil.ui.components.StreakStars
@@ -246,15 +249,22 @@ private fun BattleResultContent(
             Spacer(Modifier.height(32.dp))
 
             // 결과 헤더
-            Text(
-                text = when {
-                    isStreakComplete -> "🏆"
-                    isWin -> "✅"
-                    isDraw -> "🤝"
-                    else -> "❌"
-                },
-                fontSize = 64.sp
-            )
+            if (isStreakComplete) {
+                Image(
+                    painter = painterResource(R.drawable.anim_streak_complete),
+                    contentDescription = "연승 달성",
+                    modifier = Modifier.size(120.dp).clip(RoundedCornerShape(16.dp))
+                )
+            } else {
+                Text(
+                    text = when {
+                        isWin -> "✅"
+                        isDraw -> "🤝"
+                        else -> "❌"
+                    },
+                    fontSize = 64.sp
+                )
+            }
             Text(
                 text = when {
                     isStreakComplete -> "연승 달성! 추첨 참여!"

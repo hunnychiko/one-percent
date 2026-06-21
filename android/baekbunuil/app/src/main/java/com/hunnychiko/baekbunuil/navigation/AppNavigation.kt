@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.hunnychiko.baekbunuil.ui.screens.auth.LoginScreen
 import com.hunnychiko.baekbunuil.ui.screens.battle.BattleScreen
+import com.hunnychiko.baekbunuil.ui.screens.invite.InviteScreen
 import com.hunnychiko.baekbunuil.ui.screens.main.MainScreen
 import com.hunnychiko.baekbunuil.ui.screens.matching.MatchingScreen
 import com.hunnychiko.baekbunuil.ui.screens.mypage.MyPageScreen
@@ -30,6 +31,7 @@ object Routes {
     const val BATTLE = "battle/{roomId}"
     const val RAFFLE_RESULT = "raffle_result/{roomId}"
     const val MYPAGE = "mypage"
+    const val INVITE = "invite"
 
     fun productDetail(roomId: String) = "product/$roomId"
     fun ticket(roomId: String) = "ticket/$roomId"
@@ -64,7 +66,8 @@ fun AppNavigation(
                 onProductClick = { roomId -> navController.navigate(Routes.productDetail(roomId)) },
                 onSignOut = {
                     navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } }
-                }
+                },
+                onInvite = { navController.navigate(Routes.INVITE) }
             )
         }
         composable(
@@ -132,7 +135,14 @@ fun AppNavigation(
             MyPageScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onSignOut = { navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } } }
+                onSignOut = { navController.navigate(Routes.LOGIN) { popUpTo(0) { inclusive = true } } },
+                onInvite = { navController.navigate(Routes.INVITE) }
+            )
+        }
+        composable(Routes.INVITE) {
+            InviteScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }

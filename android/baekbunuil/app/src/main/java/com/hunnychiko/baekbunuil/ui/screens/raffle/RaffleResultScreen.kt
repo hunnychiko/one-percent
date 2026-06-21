@@ -1,6 +1,7 @@
 package com.hunnychiko.baekbunuil.ui.screens.raffle
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,12 +9,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hunnychiko.baekbunuil.R
 import com.hunnychiko.baekbunuil.data.model.DrawResult
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
 import com.hunnychiko.baekbunuil.ui.components.ParticipantBar
@@ -91,7 +95,11 @@ private fun WaitingForDraw(
     onHome: () -> Unit,
     rotation: Float
 ) {
-    Text("🎉", fontSize = 72.sp)
+    Image(
+        painter = painterResource(R.drawable.anim_raffle_draw),
+        contentDescription = "추첨 대기",
+        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp))
+    )
     Text(
         "추첨 슬롯 입장 완료!",
         style = MaterialTheme.typography.headlineLarge.copy(color = Gold, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
@@ -144,7 +152,11 @@ private fun WinnerContent(
     product: com.hunnychiko.baekbunuil.data.model.ProductRoom,
     onHome: () -> Unit
 ) {
-    Text("🏆", fontSize = 80.sp)
+    Image(
+        painter = painterResource(R.drawable.anim_raffle_win),
+        contentDescription = "당첨",
+        modifier = Modifier.size(120.dp).clip(RoundedCornerShape(16.dp))
+    )
     Text(
         "당첨!",
         style = MaterialTheme.typography.displayLarge.copy(color = Gold, fontWeight = FontWeight.Black)
