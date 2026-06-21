@@ -262,15 +262,17 @@ fun ProductEmoji(product: ProductRoom) {
     )
 }
 
-fun productEmoji(product: ProductRoom): String = when {
-    product.productName.contains("청소기") || product.productName.contains("Roborock") -> "🤖"
-    product.productName.contains("이어폰") || product.productName.contains("AirPods") || product.productName.contains("Buds") -> "🎧"
-    product.productName.contains("치킨") -> "🍗"
-    product.productName.contains("커피") -> "☕"
-    product.productName.contains("아이스크림") -> "🍦"
-    product.productName.contains("영화") -> "🎬"
-    product.productName.contains("피자") -> "🍕"
-    product.productName.contains("공기청정") || product.productName.contains("다이슨") -> "💨"
+fun productEmoji(product: ProductRoom): String = productEmoji(product.productName)
+
+fun productEmoji(name: String): String = when {
+    name.contains("청소기") || name.contains("Roborock") -> "🤖"
+    name.contains("이어폰") || name.contains("AirPods") || name.contains("Buds") -> "🎧"
+    name.contains("치킨") -> "🍗"
+    name.contains("커피") -> "☕"
+    name.contains("아이스크림") -> "🍦"
+    name.contains("영화") -> "🎬"
+    name.contains("피자") -> "🍕"
+    name.contains("공기청정") || name.contains("다이슨") -> "💨"
     else -> "🎁"
 }
 

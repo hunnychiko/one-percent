@@ -28,7 +28,6 @@ import com.hunnychiko.baekbunuil.ui.components.TopBar
 import com.hunnychiko.baekbunuil.ui.components.productEmoji
 import com.hunnychiko.baekbunuil.ui.screens.affiliate.AffiliateBannerSection
 import com.hunnychiko.baekbunuil.ui.theme.*
-import androidx.compose.ui.graphics.Color
 import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 
 @Composable

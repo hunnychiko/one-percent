@@ -135,7 +135,7 @@ private fun WaitingForDraw(
         style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary, textAlign = TextAlign.Center)
     )
 
-    Spacer(Modifier.weight(1f))
+    Spacer(Modifier.height(40.dp))
 
     Button(
         onClick = onHome,
@@ -179,7 +179,7 @@ private fun WinnerContent(
         }
     }
 
-    Spacer(Modifier.weight(1f))
+    Spacer(Modifier.height(40.dp))
     Button(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -216,7 +216,7 @@ private fun LoserContent(
         }
     }
 
-    Spacer(Modifier.weight(1f))
+    Spacer(Modifier.height(40.dp))
     Button(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
