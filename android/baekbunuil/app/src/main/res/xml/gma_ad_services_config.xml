@@ -1,0 +1,3 @@
+<ad-services-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <ad-id allowAllToAccess="true"/>
+</ad-services-config>
