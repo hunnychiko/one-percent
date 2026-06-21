@@ -2,11 +2,13 @@ package com.hunnychiko.baekbunuil.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.hunnychiko.baekbunuil.data.model.*
 import com.hunnychiko.baekbunuil.data.repository.GameRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -117,6 +119,7 @@ class AppViewModel : ViewModel() {
                 _user.value = user
                 loadProducts()
                 loadTodayAdCount(uid)
+                registerFcmToken(uid)
                 onSuccess()
             } catch (e: Exception) {
                 _error.value = "로그인 실패: ${e.message}"
@@ -135,12 +138,22 @@ class AppViewModel : ViewModel() {
                 _user.value = user
                 loadProducts()
                 loadTodayAdCount(uid)
+                registerFcmToken(uid)
                 onSuccess()
             } catch (e: Exception) {
                 _error.value = "Google 로그인 실패: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private fun registerFcmToken(userId: String) {
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                repo.saveFcmToken(userId, token)
+            } catch (_: Exception) {}
         }
     }
 
@@ -202,7 +215,7 @@ class AppViewModel : ViewModel() {
                 val opponent = Opponent(
                     userId = "bot_${System.currentTimeMillis()}",
                     nickname = listOf("우주탐험가", "별빛기사", "도전왕", "연승마스터").random(),
-                    currentStreak = myStreak,   // 동일 연승 수 상대와 매칭
+                    currentStreak = myStreak,
                     avatarIndex = (0..9).random()
                 )
                 _matchState.value = MatchUiState.Found(matchId, opponent)
@@ -400,17 +413,14 @@ class AppViewModel : ViewModel() {
 
     fun clearClaimMessage() { _claimMessage.value = null }
 
-    // 도전 포기 → 100% 직접 획득 처리 (결제 완료 후 호출)
     fun forfeitForGuaranteed(roomId: String, onSuccess: () -> Unit) {
         val uid = repo.currentUserId
         if (uid.isEmpty()) return
         viewModelScope.launch {
             val product = _products.value.find { it.roomId == roomId } ?: return@launch
-            // 챌린지 초기화
             _currentChallenge.value = null
             _battleState.value = BattleUiState.Waiting
             _matchState.value = MatchUiState.Idle
-            // 클레임 생성 (guaranteed 상태로)
             val claim = repo.createOrGetClaim(uid, roomId, product.productName, product.productType)
             _currentClaim.value = claim
             onSuccess()
