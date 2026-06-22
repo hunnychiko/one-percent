@@ -8,13 +8,13 @@ import {
 
 // ─── Firebase 설정 (firebase console → 프로젝트 설정에서 복사) ───────────────
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "YOUR_PROJECT",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyCwSMYR5OYZlo58bQVeto517vgVy4WmnW0",
+  authDomain:        "one-percent-eabb1.firebaseapp.com",
+  databaseURL:       "https://one-percent-eabb1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "one-percent-eabb1",
+  storageBucket:     "one-percent-eabb1.firebasestorage.app",
+  messagingSenderId: "1066128488466",
+  appId:             "1:1066128488466:web:fc1b8b1705c14fecd980cb"
 };
 // ──────────────────────────────────────────────────────────────────────────────
 
