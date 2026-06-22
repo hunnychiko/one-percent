@@ -15,10 +15,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.hunnychiko.baekbunuil.data.model.ProductRoom
 import com.hunnychiko.baekbunuil.data.model.gradeFromStreak
 import com.hunnychiko.baekbunuil.ui.theme.*
@@ -175,11 +179,7 @@ fun HeroProductCard(product: ProductRoom, myCurrentStreak: Int = 0, onClick: () 
                             maxLines = 1
                         )
                     }
-                    Text(
-                        text = productEmoji(product),
-                        fontSize = 56.sp,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
+                    ProductEmoji(product = product, imageSize = 80.dp, emojiSize = 56.sp)
                 }
                 Spacer(Modifier.height(16.dp))
                 StreakStars(current = myCurrentStreak, target = product.requiredStreak, large = true)
@@ -261,12 +261,28 @@ fun ParticipantBar(current: Int, total: Int, fillPercent: Float) {
 }
 
 @Composable
-fun ProductEmoji(product: ProductRoom) {
-    Text(
-        text = productEmoji(product),
-        fontSize = 42.sp,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+fun ProductEmoji(
+    product: ProductRoom,
+    imageSize: Dp = 52.dp,
+    emojiSize: TextUnit = 42.sp
+) {
+    if (product.imageUrl.isNotEmpty()) {
+        AsyncImage(
+            model = product.imageUrl,
+            contentDescription = product.productName,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(imageSize)
+                .clip(RoundedCornerShape(8.dp))
+                .padding(start = 8.dp)
+        )
+    } else {
+        Text(
+            text = productEmoji(product),
+            fontSize = emojiSize,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
 }
 
 fun productEmoji(product: ProductRoom): String = productEmoji(product.productName)

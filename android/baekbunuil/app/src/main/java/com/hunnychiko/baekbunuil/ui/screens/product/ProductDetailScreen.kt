@@ -11,11 +11,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.hunnychiko.baekbunuil.data.model.ProductRoom
 import com.hunnychiko.baekbunuil.data.model.gradeFromStreak
 import com.hunnychiko.baekbunuil.data.model.sampleProducts
@@ -72,13 +76,36 @@ fun ProductDetailScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
-                    .background(
-                        Brush.verticalGradient(listOf(CardBackgroundLight, Background))
-                    ),
+                    .height(220.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = productEmoji(product), fontSize = 96.sp)
+                if (product.imageUrl.isNotEmpty()) {
+                    AsyncImage(
+                        model = product.imageUrl,
+                        contentDescription = product.productName,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    // 아래쪽 그라데이션 오버레이
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.Transparent, Background.copy(alpha = 0.65f))
+                                )
+                            )
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Brush.verticalGradient(listOf(CardBackgroundLight, Background))),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = productEmoji(product), fontSize = 96.sp)
+                    }
+                }
                 // 1/100 배지
                 Surface(
                     modifier = Modifier

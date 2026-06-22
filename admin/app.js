@@ -43,6 +43,7 @@ const modalTitle    = document.getElementById("modal-title");
 const modalRoomId   = document.getElementById("modal-room-id");
 const fName         = document.getElementById("f-name");
 const fDesc         = document.getElementById("f-desc");
+const fImageUrl     = document.getElementById("f-image-url");
 const fGrade        = document.getElementById("f-grade");
 const fStreak       = document.getElementById("f-streak");
 const fCapacity     = document.getElementById("f-capacity");
@@ -210,7 +211,7 @@ addProductBtn.addEventListener("click", () => openAddModal());
 function openAddModal() {
   modalTitle.textContent = "상품 추가";
   modalRoomId.value = "";
-  fName.value = ""; fDesc.value = ""; fGrade.value = "C";
+  fName.value = ""; fDesc.value = ""; fImageUrl.value = ""; fGrade.value = "C";
   fStreak.value = 3; fCapacity.value = 100; fType.value = "coupon";
   fDirect.value = ""; fDrawMethod.value = "timestamp"; fStatus.value = "open";
   show(productModal);
@@ -223,6 +224,7 @@ function openEditModal(id) {
   modalRoomId.value = id;
   fName.value         = p.productName || "";
   fDesc.value         = p.description || "";
+  fImageUrl.value     = p.imageUrl || "";
   fGrade.value        = p.grade || "C";
   fStreak.value       = p.requiredStreak || 3;
   fCapacity.value     = p.capacity || 100;
@@ -241,14 +243,14 @@ modalSaveBtn.addEventListener("click", async () => {
   const payload = {
     productName:    fName.value.trim(),
     description:    fDesc.value.trim(),
+    imageUrl:       fImageUrl.value.trim(),
     grade:          fGrade.value,
     requiredStreak: Number(fStreak.value),
     capacity:       Number(fCapacity.value),
     productType:    fType.value,
     directBuyLabel: fDirect.value.trim(),
     drawMethod:     fDrawMethod.value,
-    drawStatus:     fStatus.value,
-    imageUrl:       ""
+    drawStatus:     fStatus.value
   };
   if (!payload.productName) { showToast("상품명을 입력해주세요."); return; }
 
