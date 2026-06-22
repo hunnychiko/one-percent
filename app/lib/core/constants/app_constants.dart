@@ -1,5 +1,5 @@
 abstract class AppConstants {
-  static const String appName = 'Sleep Sound';
+  static const String appName = 'Lullify';
 
   // Timer presets (minutes)
   static const List<int> timerPresets = [15, 30, 60, 90];

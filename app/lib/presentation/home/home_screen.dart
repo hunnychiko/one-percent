@@ -24,7 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sleep Sound'),
+        title: const Text('Lullify'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),

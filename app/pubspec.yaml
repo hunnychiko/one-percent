@@ -1,5 +1,5 @@
-name: sleep_sound_app
-description: 수면 백색소음 앱 — 틀어두면 조용히 잠들고 알아서 꺼지는 앱
+name: lullify
+description: Lullify — 틀어두면 조용히 잠들고 알아서 꺼지는 수면 사운드 앱
 publish_to: 'none'
 version: 1.0.0+1
 

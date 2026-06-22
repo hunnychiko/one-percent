@@ -15,7 +15,7 @@ Future<void> main() async {
 
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.sleepsound.app.audio',
-    androidNotificationChannelName: 'Sleep Sound',
+    androidNotificationChannelName: 'Lullify',
     androidNotificationOngoing: true,
     androidStopForegroundOnPause: true,
   );
@@ -47,7 +47,7 @@ class SleepSoundApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sleep Sound',
+      title: 'Lullify',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       localizationsDelegates: const [
