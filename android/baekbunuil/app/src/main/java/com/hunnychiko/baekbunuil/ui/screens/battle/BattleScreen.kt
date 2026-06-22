@@ -9,6 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -404,6 +406,15 @@ private fun BattleResultContent(
     val isDraw = state.result == MatchResult.DRAW
     val isStreakComplete = isWin && state.newStreak >= state.targetStreak
 
+    var showFairness by remember { mutableStateOf(false) }
+    LaunchedEffect(state.revealedSeed) {
+        if (state.revealedSeed.isNotEmpty()) {
+            showFairness = true
+            delay(5000)
+            showFairness = false
+        }
+    }
+
     val backgroundColor = when {
         isStreakComplete -> Brush.verticalGradient(listOf(Primary.copy(alpha = 0.3f), Background))
         isWin -> Brush.verticalGradient(listOf(Success.copy(alpha = 0.2f), Background))
@@ -570,34 +581,57 @@ private fun BattleResultContent(
                     }
                 }
             }
-            // 공정성 검증 카드
-            if (state.revealedSeed.isNotEmpty()) {
-                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text("🔍 공정성 검증", style = MaterialTheme.typography.titleSmall.copy(color = Primary))
-                        Spacer(Modifier.height(6.dp))
-                        Text("공개 시드", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
-                        Text(
-                            state.revealedSeed,
-                            style = MaterialTheme.typography.bodySmall.copy(color = TextPrimary),
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            Spacer(Modifier.height(16.dp))
+        }
+
+        AnimatedVisibility(
+            visible = showFairness,
+            enter = slideInVertically { it } + fadeIn(),
+            exit = slideOutVertically { it } + fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = CardBackground,
+                shadowElevation = 8.dp
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Security,
+                            contentDescription = null,
+                            tint = Primary,
+                            modifier = Modifier.size(14.dp)
                         )
-                        Spacer(Modifier.height(4.dp))
-                        Text("커밋 해시 (SHA256)", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
-                        Text(
-                            state.commitHash,
-                            style = MaterialTheme.typography.bodySmall.copy(color = Primary),
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            "검증: SHA256(시드|${state.opponentChoice.name}) = 커밋 해시",
-                            style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
-                        )
+                        Text("공정성 검증", style = MaterialTheme.typography.titleSmall.copy(color = Primary))
                     }
+                    Spacer(Modifier.height(6.dp))
+                    Text("공개 시드", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                    Text(
+                        state.revealedSeed,
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextPrimary),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text("커밋 해시 (SHA256)", style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary))
+                    Text(
+                        state.commitHash,
+                        style = MaterialTheme.typography.bodySmall.copy(color = Primary),
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "검증: SHA256(시드|${state.opponentChoice.name}) = 커밋 해시",
+                        style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
+                    )
                 }
             }
-            Spacer(Modifier.height(16.dp))
         }
     }
 }

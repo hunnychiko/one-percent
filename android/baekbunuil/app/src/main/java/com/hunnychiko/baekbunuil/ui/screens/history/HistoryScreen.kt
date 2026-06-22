@@ -239,7 +239,7 @@ private fun EmptyHistoryState(message: String) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("📋", fontSize = 48.sp)
+            Icon(Icons.Default.Assignment, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(16.dp))
             Text(
                 message,

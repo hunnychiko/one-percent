@@ -6,8 +6,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -210,14 +211,15 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(16.dp))
 
                 // 규칙 카드
-                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("참여 규칙", style = MaterialTheme.typography.titleMedium)
-                        RuleItem("🎫", "승부권 1장 = 가위바위보 1회 대결")
-                        RuleItem("⭐", "목표 ${targetStreak}연승 달성 시 추첨 슬롯 자동 입장")
-                        RuleItem("👤", "1인 1계정 1슬롯 참여")
-                        RuleItem("🎯", "100명 모집 완료 시 자동 추첨 · 1명 당첨")
-                        RuleItem("❌", "패배 시 해당 도전 종료 (재도전 가능)")
+                        Spacer(Modifier.height(2.dp))
+                        RuleItem(Icons.Default.ConfirmationNumber, "승부권 1장 = 가위바위보 1회 대결")
+                        RuleItem(Icons.Default.Star, "목표 ${targetStreak}연승 달성 시 추첨 슬롯 자동 입장")
+                        RuleItem(Icons.Default.Person, "1인 1계정 1슬롯 참여")
+                        RuleItem(Icons.Default.Adjust, "100명 모집 완료 시 자동 추첨 · 1명 당첨")
+                        RuleItem(Icons.Default.Close, "패배 시 해당 도전 종료 (재도전 가능)")
                     }
                 }
 
@@ -287,9 +289,12 @@ fun ProductDetailScreen(
 }
 
 @Composable
-private fun RuleItem(emoji: String, text: String) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(emoji, fontSize = 14.sp)
+private fun RuleItem(icon: ImageVector, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(15.dp))
         Text(text, style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary))
     }
 }

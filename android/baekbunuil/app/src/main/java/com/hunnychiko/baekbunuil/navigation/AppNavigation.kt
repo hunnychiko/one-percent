@@ -85,7 +85,7 @@ fun AppNavigation(
             ProductDetailScreen(
                 roomId = roomId,
                 viewModel = viewModel,
-                onChallenge = { navController.navigate(Routes.ticket(roomId)) },
+                onChallenge = { navController.navigate(Routes.matching(roomId)) },
                 onWatchAd = { navController.navigate(Routes.ticket(roomId)) },
                 onBack = { navController.popBackStack() }
             )
