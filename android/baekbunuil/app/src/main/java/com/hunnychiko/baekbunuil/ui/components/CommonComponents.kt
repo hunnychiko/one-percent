@@ -193,7 +193,7 @@ fun HeroProductCard(product: ProductRoom, myCurrentStreak: Int = 0, onClick: () 
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(6.dp)
                 ) {
-                    Text("도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
+                    Text("참여하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                 }
             }
         }
@@ -274,13 +274,11 @@ fun ProductEmoji(
             modifier = Modifier
                 .size(imageSize)
                 .clip(RoundedCornerShape(8.dp))
-                .padding(start = 8.dp)
         )
     } else {
         Text(
             text = productEmoji(product),
-            fontSize = emojiSize,
-            modifier = Modifier.padding(start = 8.dp)
+            fontSize = emojiSize
         )
     }
 }

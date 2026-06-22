@@ -119,7 +119,7 @@ class GameRepository {
             val logSnapshot = adLogRef.get().await()
             val todayCount = logSnapshot.getValue(Int::class.java) ?: 0
             if (todayCount >= 10) return false
-            userRef.child("ticketCount").setValue(user.ticketCount + 1).await()
+            userRef.child("ticketCount").setValue(user.ticketCount + 2).await()
             adLogRef.setValue(todayCount + 1).await()
             true
         }

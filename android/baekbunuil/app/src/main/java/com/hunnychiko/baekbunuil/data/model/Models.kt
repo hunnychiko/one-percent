@@ -36,7 +36,10 @@ data class ProductRoom(
     // 도전 포기 시 직접 획득 가격 표시 (예: "₩9,900" / "티켓 30개" / "" = 비활성)
     val directBuyLabel: String = "",
     // "timestamp" = 기본 타임스탬프 추첨, "lotto" = 동행복권 API 결과 연동 (SS급)
-    val drawMethod: String = "timestamp"
+    val drawMethod: String = "timestamp",
+    // "capacity" = 100인 달성 시 추첨, "time" = 마감 시각 기준 추첨
+    val drawType: String = "capacity",
+    val drawDeadline: Long = 0L
 )
 
 data class AppNotification(

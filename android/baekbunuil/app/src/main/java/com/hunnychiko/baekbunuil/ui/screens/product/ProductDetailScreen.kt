@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -47,10 +46,12 @@ fun ProductDetailScreen(
 
     val currentStreak = challenge?.currentStreak ?: 0
     val targetStreak = product.requiredStreak
-    val hasTicket = (user?.ticketCount ?: 0) > 0
+    val ticketCount = user?.ticketCount ?: 0
+    val hasTicket = ticketCount > 0
     val isParticipating = challenge != null && challenge?.state == "active"
     val hasCompleted = currentStreak >= targetStreak
     val grade = gradeFromStreak(product.requiredStreak)
+    var showNoTicketDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = Background,
@@ -72,11 +73,39 @@ fun ProductDetailScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // 상품 이미지 영역
+            // 승부권 수 표시
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Primary.copy(alpha = 0.15f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Primary.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("🎫", fontSize = 14.sp)
+                        Text(
+                            "승부권 ${ticketCount}장",
+                            style = MaterialTheme.typography.labelLarge.copy(color = Primary)
+                        )
+                    }
+                }
+            }
+
+            // 상품 이미지 영역 (정사각형, 좌우 20dp 마진)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp),
+                    .padding(horizontal = 20.dp)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (product.imageUrl.isNotEmpty()) {
@@ -85,16 +114,6 @@ fun ProductDetailScreen(
                         contentDescription = product.productName,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
-                    )
-                    // 아래쪽 그라데이션 오버레이
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(Color.Transparent, Background.copy(alpha = 0.65f))
-                                )
-                            )
                     )
                 } else {
                     Box(
@@ -110,7 +129,7 @@ fun ProductDetailScreen(
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(16.dp),
+                        .padding(12.dp),
                     shape = RoundedCornerShape(10.dp),
                     color = Primary
                 ) {
@@ -230,32 +249,40 @@ fun ProductDetailScreen(
                         }
                     }
                     else -> {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = Warning.copy(alpha = 0.15f),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    "승부권이 없습니다. 광고를 시청하여 승부권을 획득하세요.",
-                                    modifier = Modifier.padding(12.dp),
-                                    style = MaterialTheme.typography.bodySmall.copy(color = Warning),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                            Button(
-                                onClick = onWatchAd,
-                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("▶ 광고 보고 승부권 받기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
-                            }
+                        Button(
+                            onClick = { showNoTicketDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "도전하기 ✊",
+                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
+                            )
                         }
                     }
                 }
             }
         }
+    }
+
+    if (showNoTicketDialog) {
+        AlertDialog(
+            onDismissRequest = { showNoTicketDialog = false },
+            title = { Text("승부권이 없습니다") },
+            text = { Text("광고를 시청하면 승부권 2장을 받을 수 있습니다.\n승부권 충전소로 이동하시겠습니까?") },
+            confirmButton = {
+                TextButton(onClick = { showNoTicketDialog = false; onWatchAd() }) {
+                    Text("이동", color = Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNoTicketDialog = false }) {
+                    Text("취소", color = TextSecondary)
+                }
+            },
+            containerColor = CardBackground
+        )
     }
 }
 

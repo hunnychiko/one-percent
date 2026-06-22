@@ -76,7 +76,7 @@ fun MyPageScreen(
             modifier = Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 24.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // 프로필 카드
@@ -214,7 +214,10 @@ fun MyPageScreen(
                     Switch(
                         checked = adConsent,
                         onCheckedChange = { adConsent = it },
-                        colors = SwitchDefaults.colors(checkedThumbColor = TextPrimary, checkedTrackColor = Primary)
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = TextPrimary, checkedTrackColor = Primary,
+                            uncheckedThumbColor = TextSecondary, uncheckedTrackColor = CardBackgroundLight
+                        )
                     )
                 }
                 Spacer(Modifier.height(12.dp))

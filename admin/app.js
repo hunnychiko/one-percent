@@ -50,6 +50,9 @@ const fCapacity     = document.getElementById("f-capacity");
 const fType         = document.getElementById("f-type");
 const fDirect       = document.getElementById("f-direct");
 const fDrawMethod   = document.getElementById("f-draw-method");
+const fDrawType     = document.getElementById("f-draw-type");
+const fDrawDeadline = document.getElementById("f-draw-deadline");
+const drawDeadlineWrap = document.getElementById("draw-deadline-wrap");
 const fStatus       = document.getElementById("f-status");
 const modalCancelBtn = document.getElementById("modal-cancel-btn");
 const modalSaveBtn   = document.getElementById("modal-save-btn");
@@ -104,6 +107,13 @@ loginBtn.addEventListener("click", async () => {
 });
 
 pwInput.addEventListener("keydown", e => { if (e.key === "Enter") loginBtn.click(); });
+
+const pwToggle = document.getElementById("pw-toggle");
+pwToggle.addEventListener("click", () => {
+  const isPassword = pwInput.type === "password";
+  pwInput.type = isPassword ? "text" : "password";
+  pwToggle.textContent = isPassword ? "🙈" : "👁";
+});
 
 logoutBtn.addEventListener("click", () => signOut(auth));
 
@@ -215,6 +225,8 @@ function openAddModal() {
   fName.value = ""; fDesc.value = ""; fImageUrl.value = ""; fGrade.value = "C";
   fStreak.value = 3; fCapacity.value = 100; fType.value = "coupon";
   fDirect.value = ""; fDrawMethod.value = "timestamp"; fStatus.value = "open";
+  fDrawType.value = "capacity"; fDrawDeadline.value = "";
+  drawDeadlineWrap.style.visibility = "hidden";
   show(productModal);
 }
 
@@ -232,9 +244,17 @@ function openEditModal(id) {
   fType.value         = p.productType || "coupon";
   fDirect.value       = p.directBuyLabel || "";
   fDrawMethod.value   = p.drawMethod || "timestamp";
+  fDrawType.value     = p.drawType || "capacity";
+  fDrawDeadline.value = p.drawDeadline
+    ? new Date(p.drawDeadline).toISOString().slice(0, 16) : "";
+  drawDeadlineWrap.style.visibility = (p.drawType === "time") ? "visible" : "hidden";
   fStatus.value       = p.drawStatus || "open";
   show(productModal);
 }
+
+fDrawType.addEventListener("change", () => {
+  drawDeadlineWrap.style.visibility = fDrawType.value === "time" ? "visible" : "hidden";
+});
 
 modalCancelBtn.addEventListener("click", () => hide(productModal));
 // 바깥 클릭으로 닫히지 않도록 backdrop 이벤트 제거
@@ -251,6 +271,9 @@ modalSaveBtn.addEventListener("click", async () => {
     productType:    fType.value,
     directBuyLabel: fDirect.value.trim(),
     drawMethod:     fDrawMethod.value,
+    drawType:       fDrawType.value,
+    drawDeadline:   fDrawType.value === "time" && fDrawDeadline.value
+                      ? new Date(fDrawDeadline.value).getTime() : 0,
     drawStatus:     fStatus.value
   };
   if (!payload.productName) { showToast("상품명을 입력해주세요."); return; }

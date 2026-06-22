@@ -75,7 +75,7 @@ fun HomeContent(
 
             hero?.let { h ->
                 item {
-                    SectionHeader(title = "오늘의 히어로 🔥")
+                    SectionHeader(title = "오늘의 히어로")
                     Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                         HeroProductCard(
                             product = h,
@@ -88,11 +88,11 @@ fun HomeContent(
             }
 
             val sections = listOf(
-                ProductGrade.C  to "데일리찬스 🌱",
-                ProductGrade.B  to "위클리찬스 🔥",
-                ProductGrade.A  to "프라임찬스 ⚡",
-                ProductGrade.S  to "스페셜찬스 💎",
-                ProductGrade.SS to "프리미엄찬스 👑"
+                ProductGrade.C  to "데일리찬스",
+                ProductGrade.B  to "위클리찬스",
+                ProductGrade.A  to "프라임찬스",
+                ProductGrade.S  to "스페셜찬스",
+                ProductGrade.SS to "프리미엄찬스"
             )
             if (products.isEmpty()) {
                 item {
@@ -114,21 +114,33 @@ fun HomeContent(
                 item {
                     SectionHeader(title = label, subtitle = "목표 $streakDesc 달성 후 1/100 추첨 참여")
                 }
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(sectionProducts) { product ->
-                            Box(modifier = Modifier.width(280.dp)) {
-                                ProductCard(
-                                    product = product,
-                                    onClick = { onProductClick(product.roomId) }
-                                )
+                if (sectionProducts.size == 1) {
+                    item {
+                        Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                            ProductCard(
+                                product = sectionProducts[0],
+                                onClick = { onProductClick(sectionProducts[0].roomId) }
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+                } else {
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(sectionProducts) { product ->
+                                Box(modifier = Modifier.width(280.dp)) {
+                                    ProductCard(
+                                        product = product,
+                                        onClick = { onProductClick(product.roomId) }
+                                    )
+                                }
                             }
                         }
+                        Spacer(Modifier.height(8.dp))
                     }
-                    Spacer(Modifier.height(8.dp))
                 }
             }
         }

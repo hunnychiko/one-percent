@@ -14,7 +14,10 @@
     <div class="logo">1/100</div>
     <h2>관리자 로그인</h2>
     <input id="email-input" type="email" placeholder="관리자 이메일" autocomplete="email">
-    <input id="pw-input" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <div style="position:relative">
+      <input id="pw-input" type="password" placeholder="비밀번호" autocomplete="current-password" style="padding-right:48px;width:100%;box-sizing:border-box">
+      <button type="button" id="pw-toggle" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;line-height:1;padding:0;color:var(--text-sec)">👁</button>
+    </div>
     <button id="login-btn" class="btn-primary">로그인</button>
     <p id="login-error" class="error-msg"></p>
   </div>
@@ -162,6 +165,19 @@
           <option value="timestamp">타임스탬프 (기본)</option>
           <option value="lotto">동행복권 API (SS급)</option>
         </select>
+      </div>
+    </div>
+    <div class="form-row two-col">
+      <div>
+        <label>추첨 유형</label>
+        <select id="f-draw-type">
+          <option value="capacity">인원 달성 추첨 (기본)</option>
+          <option value="time">시간 제한 추첨 (24h)</option>
+        </select>
+      </div>
+      <div id="draw-deadline-wrap">
+        <label>마감 일시 (time 유형)</label>
+        <input id="f-draw-deadline" type="datetime-local">
       </div>
     </div>
     <div class="form-row">

@@ -49,7 +49,7 @@ class AppViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    private val _products = MutableStateFlow<List<ProductRoom>>(sampleProducts)
+    private val _products = MutableStateFlow<List<ProductRoom>>(emptyList())
     val products: StateFlow<List<ProductRoom>> = _products
 
     private val _currentChallenge = MutableStateFlow<Challenge?>(null)
@@ -192,7 +192,7 @@ class AppViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                _products.value = sampleProducts
+                _products.value = emptyList()
             }
         }
     }
@@ -221,7 +221,7 @@ class AppViewModel : ViewModel() {
             val claimed = repo.claimAdReward(uid)
             if (claimed) {
                 _todayAdCount.value = _todayAdCount.value + 1
-                _user.value = _user.value?.copy(ticketCount = (_user.value?.ticketCount ?: 0) + 1)
+                _user.value = _user.value?.copy(ticketCount = (_user.value?.ticketCount ?: 0) + 2)
                 onSuccess()
             } else {
                 onFail()

@@ -1,6 +1,7 @@
 package com.hunnychiko.baekbunuil.ui.screens.ranking
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -35,6 +36,7 @@ fun RankingScreen(
     val isLoading by viewModel.isRankingLoading.collectAsState()
 
     var selectedTab by remember { mutableStateOf(0) }
+    var selectedWinEntry by remember { mutableStateOf<RankingEntry?>(null) }
 
     LaunchedEffect(Unit) { viewModel.loadRankings() }
 
@@ -131,7 +133,8 @@ fun RankingScreen(
                     rank = index + 4,
                     entry = entry,
                     isMe = entry.userId == (user?.userId ?: ""),
-                    showStreak = selectedTab == 0
+                    showStreak = selectedTab == 0,
+                    onWinClick = { selectedWinEntry = it }
                 )
                 if (index < rankings.size - 4) {
                     HorizontalDivider(
@@ -141,6 +144,26 @@ fun RankingScreen(
                 }
             }
         }
+    }
+
+    selectedWinEntry?.let { entry ->
+        AlertDialog(
+            onDismissRequest = { selectedWinEntry = null },
+            title = { Text("${entry.nickname}님 당첨 내역") },
+            text = {
+                if (entry.totalWins == 0) {
+                    Text("아직 당첨 기록이 없습니다.", style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    Text("총 ${entry.totalWins}회 당첨", style = MaterialTheme.typography.bodyMedium.copy(color = Primary))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { selectedWinEntry = null }) {
+                    Text("닫기")
+                }
+            },
+            containerColor = CardBackground
+        )
     }
 }
 
@@ -253,7 +276,7 @@ private fun PodiumItem(entry: RankingEntry, rank: Int, height: androidx.compose.
 }
 
 @Composable
-private fun RankingRow(rank: Int, entry: RankingEntry, isMe: Boolean, showStreak: Boolean) {
+private fun RankingRow(rank: Int, entry: RankingEntry, isMe: Boolean, showStreak: Boolean, onWinClick: (RankingEntry) -> Unit = {}) {
     Surface(
         color = if (isMe) Primary.copy(alpha = 0.08f) else Color.Transparent
     ) {
@@ -286,7 +309,11 @@ private fun RankingRow(rank: Int, entry: RankingEntry, isMe: Boolean, showStreak
                         }
                     }
                 }
-                Text("당첨 ${entry.totalWins}회", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "당첨 ${entry.totalWins}회",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.clickable { onWinClick(entry) }
+                )
             }
             Text(
                 if (showStreak) "${entry.bestStreak}연승" else "${entry.totalWins}당첨",
