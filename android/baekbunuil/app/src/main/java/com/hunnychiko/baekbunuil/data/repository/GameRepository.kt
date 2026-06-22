@@ -73,7 +73,7 @@ class GameRepository {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val rooms = snapshot.children.mapNotNull { it.getValue(ProductRoom::class.java) }
-                trySend(rooms.ifEmpty { sampleProducts })
+                trySend(rooms)
             }
             override fun onCancelled(error: DatabaseError) { close(error.toException()) }
         }

@@ -94,6 +94,20 @@ fun HomeContent(
                 ProductGrade.S  to "스페셜찬스 💎",
                 ProductGrade.SS to "프리미엄찬스 👑"
             )
+            if (products.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 60.dp),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = "준비 중인 상품이 없습니다",
+                            color = androidx.compose.ui.graphics.Color.Gray,
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+            }
             sections.forEach { (grade, label) ->
                 val sectionProducts = grouped[grade] ?: return@forEach
                 val streakDesc = if (grade.minStreak == grade.maxStreak) "${grade.minStreak}연승" else "${grade.minStreak}~${grade.maxStreak}연승"
