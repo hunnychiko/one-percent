@@ -71,6 +71,7 @@ fun ProductDetailScreen(
             Surface(color = Background, shadowElevation = 8.dp) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
                     when {
