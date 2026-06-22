@@ -66,6 +66,47 @@ fun ProductDetailScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
             )
+        },
+        bottomBar = {
+            Surface(color = Background, shadowElevation = 8.dp) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    when {
+                        hasCompleted -> Button(
+                            onClick = { /* 추첨 결과 화면으로 */ },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Success),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("참여 완료 · 결과 기다리는 중 ✅", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
+                        }
+                        hasTicket -> Button(
+                            onClick = onChallenge,
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                if (isParticipating) "이어하기 ✊" else "도전하기 ✊",
+                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
+                            )
+                        }
+                        else -> Button(
+                            onClick = { showNoTicketDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "도전하기 ✊",
+                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -224,46 +265,6 @@ fun ProductDetailScreen(
                 }
 
                 Spacer(Modifier.height(24.dp))
-
-                // CTA 버튼
-                when {
-                    hasCompleted -> {
-                        Button(
-                            onClick = { /* 추첨 결과 화면으로 */ },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Success),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("참여 완료 · 결과 기다리는 중 ✅", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
-                        }
-                    }
-                    hasTicket -> {
-                        Button(
-                            onClick = onChallenge,
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                if (isParticipating) "이어하기 ✊" else "도전하기 ✊",
-                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
-                            )
-                        }
-                    }
-                    else -> {
-                        Button(
-                            onClick = { showNoTicketDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                "도전하기 ✊",
-                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
-                            )
-                        }
-                    }
-                }
             }
         }
     }
