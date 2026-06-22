@@ -148,6 +148,7 @@ function renderProductCards() {
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
+      ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.productName)}" class="product-card-img">` : ""}
       <div class="product-card-header">
         <span class="grade-badge grade-${p.grade}">${gradeLabel(p.grade)}</span>
         <span class="status-badge status-${p.drawStatus}">${p.drawStatus}</span>
@@ -236,7 +237,7 @@ function openEditModal(id) {
 }
 
 modalCancelBtn.addEventListener("click", () => hide(productModal));
-productModal.addEventListener("click", e => { if (e.target === productModal) hide(productModal); });
+// 바깥 클릭으로 닫히지 않도록 backdrop 이벤트 제거
 
 modalSaveBtn.addEventListener("click", async () => {
   const id      = modalRoomId.value;
