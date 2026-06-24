@@ -3,7 +3,11 @@ package com.hunnychiko.baekbunuil.ui.screens.main
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.EmojiEvents
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,11 +24,11 @@ import com.hunnychiko.baekbunuil.viewmodel.AppViewModel
 private data class TabItem(val icon: ImageVector, val label: String)
 
 private val tabs = listOf(
-    TabItem(Icons.Default.Home, "홈"),
-    TabItem(Icons.Default.EmojiEvents, "랭킹"),
-    TabItem(Icons.Default.PlayCircle, "충전소"),
-    TabItem(Icons.Default.History, "내기록"),
-    TabItem(Icons.Default.Person, "마이"),
+    TabItem(Icons.Outlined.Home,        "홈"),
+    TabItem(Icons.Outlined.EmojiEvents, "랭킹"),
+    TabItem(Icons.Outlined.PlayCircle,  "충전소"),
+    TabItem(Icons.Outlined.History,     "내기록"),
+    TabItem(Icons.Outlined.Person,      "마이"),
 )
 
 @Composable
@@ -55,7 +59,7 @@ fun MainScreen(
                             Icon(
                                 tab.icon,
                                 contentDescription = tab.label,
-                                tint = if (selectedTab == index) Primary else TextSecondary
+                                modifier = Modifier.size(22.dp)
                             )
                         },
                         label = {
@@ -68,7 +72,8 @@ fun MainScreen(
                         },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Primary,
-                            indicatorColor = Primary.copy(alpha = 0.15f)
+                            unselectedIconColor = TextSecondary,
+                            indicatorColor = Primary.copy(alpha = 0.12f)
                         )
                     )
                 }

@@ -11,9 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,7 +60,7 @@ fun ClaimScreen(
                 title = { Text("상품 수령", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
+                        Icon(Icons.Outlined.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -126,7 +126,7 @@ fun ClaimScreen(
 
             claimMessage?.let {
                 Surface(
-                    shape = RoundedCornerShape(6.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = if (it.startsWith("배송")) Primary.copy(alpha = 0.2f) else Error.copy(alpha = 0.2f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -156,7 +156,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
     }
 
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -192,7 +192,7 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
                         copied.value = true
                     }) {
                         Icon(
-                            Icons.Default.ContentCopy,
+                            Icons.Outlined.ContentCopy,
                             contentDescription = "복사",
                             tint = if (copied.value) Primary else TextSecondary
                         )
@@ -212,17 +212,17 @@ private fun CouponClaimSection(claim: WinnerClaim, context: Context) {
                         context.startActivity(intent)
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = RoundedCornerShape(6.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary)
                 ) {
-                    Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Outlined.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("제휴 링크로 이동", style = MaterialTheme.typography.titleMedium)
                 }
             } else {
                 // 관리자가 아직 쿠폰 코드를 입력하지 않은 경우
                 Surface(
-                    shape = RoundedCornerShape(6.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = CardBackgroundLight,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -278,7 +278,7 @@ private fun PremiumClaimSection(claim: WinnerClaim, viewModel: AppViewModel) {
 @Composable
 private fun VerificationPendingBanner() {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -318,7 +318,7 @@ private fun VerificationPendingBanner() {
 @Composable
 private fun VerificationPassedBanner() {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Success.copy(alpha = 0.15f),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -345,7 +345,7 @@ private fun VerificationPassedBanner() {
 @Composable
 private fun VerificationFailedBanner(note: String) {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -396,7 +396,7 @@ private fun AddressInputForm(claim: WinnerClaim, viewModel: AppViewModel) {
     var submitting by remember { mutableStateOf(false) }
 
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -441,7 +441,7 @@ private fun AddressInputForm(claim: WinnerClaim, viewModel: AppViewModel) {
                     viewModel.submitShippingAddress(claim.claimId, name, phone, postcode, address, detail)
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(6.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 enabled = !submitting && name.isNotBlank() && phone.isNotBlank() && postcode.isNotBlank() && address.isNotBlank()
             ) {
@@ -470,7 +470,7 @@ private fun ShippingStatusCard(claim: WinnerClaim) {
     }
 
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
         color = CardBackground,
         modifier = Modifier.fillMaxWidth()
     ) {

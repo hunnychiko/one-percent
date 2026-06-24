@@ -7,7 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Assignment
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -143,7 +144,7 @@ fun HistoryScreen(
 
 @Composable
 private fun SummaryCard(modifier: Modifier = Modifier, emoji: String, value: String, label: String) {
-    Surface(modifier = modifier, shape = RoundedCornerShape(7.dp), color = CardBackground) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(14.dp), color = CardBackground, shadowElevation = 2.dp) {
         Column(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -226,7 +227,7 @@ private fun WinHistoryCard(item: WinHistoryItem) {
             )
             Text(item.wonAt, style = MaterialTheme.typography.labelSmall)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = TextSecondary)
+        Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = TextSecondary)
     }
 }
 
@@ -239,7 +240,7 @@ private fun EmptyHistoryState(message: String) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Default.Assignment, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(48.dp))
+            Icon(Icons.Outlined.Assignment, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(16.dp))
             Text(
                 message,

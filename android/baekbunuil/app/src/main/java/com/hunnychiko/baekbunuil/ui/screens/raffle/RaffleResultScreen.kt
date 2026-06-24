@@ -141,9 +141,9 @@ private fun WaitingForDraw(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-        shape = RoundedCornerShape(7.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text("다른 상품도 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
+        Text("다른 상품도 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White))
     }
 }
 
@@ -184,9 +184,9 @@ private fun WinnerContent(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Gold),
-        shape = RoundedCornerShape(7.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = Background, fontWeight = FontWeight.Bold))
+        Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold))
     }
 }
 
@@ -221,8 +221,8 @@ private fun LoserContent(
         onClick = onHome,
         modifier = Modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-        shape = RoundedCornerShape(7.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text("다시 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
+        Text("다시 도전하기", style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White))
     }
 }

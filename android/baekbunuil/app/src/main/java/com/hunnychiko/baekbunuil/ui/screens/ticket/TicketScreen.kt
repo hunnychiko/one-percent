@@ -6,13 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,7 +88,7 @@ fun TicketScreen(
                 title = { Text("승부권 충전소", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
+                        Icon(Icons.Outlined.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -103,7 +104,7 @@ fun TicketScreen(
         ) {
             // 현재 도전 상황 카드
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -139,7 +140,7 @@ fun TicketScreen(
 
             // 광고 시청 카드
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -149,7 +150,7 @@ fun TicketScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = Secondary.copy(alpha = 0.2f)
                         ) {
                             Text("▶", modifier = Modifier.padding(12.dp), fontSize = 24.sp)
@@ -193,7 +194,7 @@ fun TicketScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (todayAdCount >= MAX_DAILY_ADS) SurfaceVariant else Primary
                         ),
-                        shape = RoundedCornerShape(7.dp),
+                        shape = RoundedCornerShape(12.dp),
                         enabled = todayAdCount < MAX_DAILY_ADS
                     ) {
                         if (isAdLoading) {
@@ -201,7 +202,7 @@ fun TicketScreen(
                         } else {
                             Text(
                                 "▶ 광고 보고 승부권 1장 받기",
-                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.titleMedium.copy(color = Color.White, fontWeight = FontWeight.Bold)
                             )
                         }
                     }
@@ -219,7 +220,7 @@ fun TicketScreen(
 
             // 오늘 보상 현황
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -251,7 +252,7 @@ fun TicketScreen(
 
             // 맞춤형 광고 설정
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
