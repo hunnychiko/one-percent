@@ -10,7 +10,7 @@
 .cxx
 *.apk
 *.aab
-google-services.json
+# google-services.json  # 비공개 레포이므로 커밋 허용
 
 # Firebase
 .firebase/

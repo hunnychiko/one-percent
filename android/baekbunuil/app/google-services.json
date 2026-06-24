@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1066128488466",
+    "firebase_url": "https://one-percent-eabb1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "one-percent-eabb1",
+    "storage_bucket": "one-percent-eabb1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1066128488466:android:3b8dac9f26e1289bd980cb",
+        "android_client_info": {
+          "package_name": "com.hunnychiko.baekbunuil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1066128488466-o54ctov1bh9ccke7fnj9j7phpmtf40du.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVlXuuSIWJeovE29YSoz3sbKW0eL66JIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1066128488466-o54ctov1bh9ccke7fnj9j7phpmtf40du.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
