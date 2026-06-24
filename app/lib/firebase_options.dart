@@ -1,5 +1,3 @@
-// Firebase 프로젝트 생성 후 `flutterfire configure` 실행 시 자동 생성됩니다.
-// 현재는 플레이스홀더 — 실제 값으로 교체 필요.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
@@ -19,30 +17,29 @@ class DefaultFirebaseOptions {
     }
   }
 
-  // TODO: flutterfire configure 실행 후 아래 값을 교체하세요
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
+    apiKey: 'AIzaSyBwOh4oW_MrBwnWU75VsrOKJ6TcN6EDt9U',
+    appId: '1:698948290605:android:3481f77c5fcde9726310a4',
+    messagingSenderId: '698948290605',
+    projectId: 'lullify-d08eb',
+    storageBucket: 'lullify-d08eb.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
-    iosBundleId: 'com.sleepsound.app',
+    apiKey: 'AIzaSyAW66YynsU-sYkl2DebTmWR62H_alx4qNM',
+    appId: '1:698948290605:ios:4e81442b5a650d426310a4',
+    messagingSenderId: '698948290605',
+    projectId: 'lullify-d08eb',
+    storageBucket: 'lullify-d08eb.firebasestorage.app',
+    iosBundleId: 'com.lullify.app',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '698948290605',
+    projectId: 'lullify-d08eb',
+    storageBucket: 'lullify-d08eb.firebasestorage.app',
+    authDomain: 'lullify-d08eb.firebaseapp.com',
   );
 }
