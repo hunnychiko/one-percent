@@ -38,7 +38,7 @@ class AppTheme {
           fontFamily: 'Pretendard',
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: _surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
