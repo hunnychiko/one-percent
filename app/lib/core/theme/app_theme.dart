@@ -25,7 +25,6 @@ class AppTheme {
         surfaceContainerHighest: _surfaceVariant,
         secondary: _accent,
       ),
-      fontFamily: 'Pretendard',
       appBarTheme: const AppBarTheme(
         backgroundColor: _background,
         foregroundColor: _onBackground,
@@ -35,8 +34,7 @@ class AppTheme {
           color: _onBackground,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Pretendard',
-        ),
+            ),
       ),
       cardTheme: CardThemeData(
         color: _surface,

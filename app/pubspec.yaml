@@ -59,12 +59,3 @@ flutter:
     - assets/images/
     - assets/lottie/
 
-  fonts:
-    - family: Pretendard
-      fonts:
-        - asset: assets/fonts/Pretendard-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Pretendard-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Pretendard-SemiBold.ttf
-          weight: 600
