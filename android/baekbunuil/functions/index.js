@@ -30,27 +30,37 @@ exports.claimAdReward = functions.https.onCall(async (data, context) => {
   return { success: true, todayCount: todayCount + 1 };
 });
 
-// 매칭 큐 입장 및 매치 생성
+// 매칭 큐 입장 및 매치 생성 (연승 레벨별 매칭)
 exports.enterMatchQueue = functions.https.onCall(async (data, context) => {
   if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "로그인 필요");
 
   const userId = context.auth.uid;
-  const { roomId } = data;
+  const { roomId, streak = 0 } = data;
 
-  const queueRef = db.ref(`matchQueue/${roomId}`);
+  // 연승 레벨별 큐: matchQueue/$roomId/$streak/$userId
+  const queueRef = db.ref(`matchQueue/${roomId}/${streak}`);
   const queueSnap = await queueRef.once("value");
   const queue = queueSnap.val() || {};
-  const waitingUsers = Object.keys(queue).filter((uid) => queue[uid] === true && uid !== userId);
+  const waitingUsers = Object.keys(queue).filter((uid) => uid !== userId);
 
   if (waitingUsers.length > 0) {
-    // 상대방 발견 — 매치 생성
     const opponentId = waitingUsers[0];
+
+    // 상대방 정보 조회
+    const [opponentSnap, challengeSnap] = await Promise.all([
+      db.ref(`users/${opponentId}`).once("value"),
+      db.ref(`challenges/${opponentId}_${roomId}`).once("value"),
+    ]);
+    const opponentUser = opponentSnap.val() || {};
+    const opponentChallenge = challengeSnap.val() || {};
+
     const matchId = `match_${Date.now()}`;
     const match = {
       matchId,
       userA: userId,
       userB: opponentId,
       roomId,
+      streak,
       choiceA: null,
       choiceB: null,
       result: null,
@@ -59,15 +69,22 @@ exports.enterMatchQueue = functions.https.onCall(async (data, context) => {
 
     await Promise.all([
       db.ref(`matches/${matchId}`).set(match),
-      db.ref(`matchQueue/${roomId}/${opponentId}`).remove(),
+      db.ref(`matchQueue/${roomId}/${streak}/${opponentId}`).remove(),
       db.ref(`userCurrentMatch/${userId}`).set(matchId),
       db.ref(`userCurrentMatch/${opponentId}`).set(matchId),
     ]);
 
-    return { matchId, status: "matched", opponent: opponentId };
+    return {
+      matchId,
+      status: "matched",
+      opponent: {
+        userId: opponentId,
+        nickname: opponentUser.nickname || "상대방",
+        currentStreak: opponentChallenge.currentStreak || 0,
+      },
+    };
   } else {
-    // 큐에 등록하고 대기
-    await queueRef.child(userId).set(true);
+    await queueRef.child(userId).set(admin.database.ServerValue.TIMESTAMP);
     return { matchId: null, status: "waiting" };
   }
 });
@@ -84,13 +101,14 @@ exports.processMatchResult = functions.database
     if (!match || match.result) return;
 
     const { userA, userB, roomId } = match;
-    if (!choices[userA] || !choices[userB]) return; // 아직 한 명이 선택 안 함
+    if (!choices[userA] || !choices[userB]) return;
 
     const choiceA = choices[userA];
     const choiceB = choices[userB];
 
     const resultForA = determineResult(choiceA, choiceB);
     const winnerId = resultForA === "WIN" ? userA : resultForA === "LOSE" ? userB : null;
+    const loserId  = resultForA === "WIN" ? userB : resultForA === "LOSE" ? userA : null;
 
     await db.ref(`matches/${matchId}`).update({
       choiceA,
@@ -99,14 +117,64 @@ exports.processMatchResult = functions.database
       resolvedAt: admin.database.ServerValue.TIMESTAMP,
     });
 
-    if (winnerId) {
-      const challengeRef = db.ref(`challenges/${winnerId}_${roomId}`);
-      await challengeRef.transaction((challenge) => {
-        if (!challenge) return { userId: winnerId, roomId, currentStreak: 1, state: "active" };
-        const newStreak = (challenge.currentStreak || 0) + 1;
-        const room = match; // productRoom data would be fetched in prod
-        return { ...challenge, currentStreak: newStreak };
-      });
+    if (!winnerId || !loserId) return; // DRAW: 티켓/챌린지 변동 없음
+
+    // 패배자 티켓 1장 차감 (0 미만 방지)
+    await db.ref(`users/${loserId}/ticketCount`).transaction((current) =>
+      Math.max(0, (current || 0) - 1)
+    );
+
+    // 패배자 챌린지 연승 리셋
+    await db.ref(`challenges/${loserId}_${roomId}`).transaction((challenge) => {
+      if (!challenge) return null;
+      return { ...challenge, currentStreak: 0, state: "reset" };
+    });
+
+    // 승자 챌린지 연승 +1 및 목표 달성 여부 확인
+    const winnerChallengeRef = db.ref(`challenges/${winnerId}_${roomId}`);
+    const challengeSnap = await winnerChallengeRef.once("value");
+    const challenge = challengeSnap.val();
+
+    let newStreak = (challenge?.currentStreak || 0) + 1;
+    const targetStreak = challenge?.targetStreak || 0;
+    const completed = targetStreak > 0 && newStreak >= targetStreak;
+
+    await winnerChallengeRef.transaction((c) => {
+      if (!c) return { userId: winnerId, roomId, currentStreak: 1, state: "active" };
+      return { ...c, currentStreak: newStreak, state: completed ? "completed" : "active" };
+    });
+
+    // 목표 연승 달성 → 추첨 등록 (중복 방지)
+    if (completed) {
+      const entryRef = db.ref(`drawEntries/${roomId}/${winnerId}`);
+      const alreadyEntered = await entryRef.once("value");
+      if (!alreadyEntered.exists()) {
+        await Promise.all([
+          entryRef.set({
+            entryId: `${roomId}_${winnerId}`,
+            roomId,
+            userId: winnerId,
+            enteredAt: admin.database.ServerValue.TIMESTAMP,
+          }),
+          db.ref(`productRooms/${roomId}/currentCount`).transaction((count) => (count || 0) + 1),
+        ]);
+      }
+    }
+
+    // 승자 FCM 알림
+    const tokenSnap = await db.ref(`users/${winnerId}/fcmToken`).once("value");
+    const fcmToken = tokenSnap.val();
+    if (fcmToken) {
+      await admin.messaging().send({
+        token: fcmToken,
+        notification: {
+          title: "✊ 승리!",
+          body: completed
+            ? `목표 연승 달성! 추첨에 자동 등록되었습니다 🏆`
+            : `가위바위보에서 이겼어요! 현재 ${newStreak}연승 중.`,
+        },
+        data: { roomId, type: "match_win", streak: String(newStreak) },
+      }).catch(() => {});
     }
   });
 
@@ -143,22 +211,29 @@ exports.autoDrawWinner = functions.database
       db.ref(`drawResults/${roomId}`).set(drawResult),
       db.ref(`productRooms/${roomId}/drawStatus`).set("drawn"),
       db.ref(`users/${winnerUserId}/wonProducts`).push(roomId),
-      // 당첨 알림 발송 (FCM)
-      admin.messaging().sendToTopic(`user_${winnerUserId}`, {
+    ]);
+
+    // 당첨자 FCM 알림 (토큰 방식)
+    const tokenSnap = await db.ref(`users/${winnerUserId}/fcmToken`).once("value");
+    const fcmToken = tokenSnap.val();
+    if (fcmToken) {
+      await admin.messaging().send({
+        token: fcmToken,
         notification: {
           title: "🏆 당첨됐어요!",
           body: `${room.productName} 1/100 추첨에 당첨되셨습니다!`,
         },
-      }),
-    ]);
+        data: { roomId, type: "draw_winner" },
+      }).catch(() => {});
+    }
   });
 
 function determineResult(mine, opponent) {
   if (mine === opponent) return "DRAW";
   if (
     (mine === "SCISSORS" && opponent === "PAPER") ||
-    (mine === "ROCK" && opponent === "SCISSORS") ||
-    (mine === "PAPER" && opponent === "ROCK")
+    (mine === "ROCK"     && opponent === "SCISSORS") ||
+    (mine === "PAPER"    && opponent === "ROCK")
   ) return "WIN";
   return "LOSE";
 }

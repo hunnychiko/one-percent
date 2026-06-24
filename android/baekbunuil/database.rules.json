@@ -19,21 +19,34 @@
     "matches": {
       "$matchId": {
         ".read": "auth !== null",
-        ".write": false
+        ".write": false,
+        "choices": {
+          "$userId": {
+            ".write": "$userId === auth.uid"
+          }
+        }
       }
     },
     "matchQueue": {
       "$roomId": {
-        "$userId": {
-          ".read": "$userId === auth.uid",
-          ".write": "$userId === auth.uid"
+        "$streak": {
+          "$userId": {
+            ".read": "$userId === auth.uid",
+            ".write": "$userId === auth.uid"
+          }
         }
       }
     },
+    "userCurrentMatch": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": false
+      }
+    },
     "drawEntries": {
+      ".read": "auth !== null",
       "$roomId": {
         "$userId": {
-          ".read": "$userId === auth.uid",
           ".write": "$userId === auth.uid"
         }
       }
@@ -45,6 +58,47 @@
       }
     },
     "adLogs": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": false
+      }
+    },
+    "affiliateBanners": {
+      ".read": "auth !== null",
+      ".write": false
+    },
+    "affiliateClaims": {
+      "$bannerId": {
+        "$userId": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid"
+        }
+      }
+    },
+    "inviteCodes": {
+      ".read": "auth !== null",
+      "$code": {
+        ".write": "auth !== null && (!data.exists() || data.child('ownerUserId').val() === auth.uid)"
+      }
+    },
+    "inviteUsed": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "$userId === auth.uid && !data.exists()"
+      }
+    },
+    "winnerClaims": {
+      "$claimId": {
+        ".read": "data.child('userId').val() === auth.uid",
+        ".write": "auth !== null && (newData.child('userId').val() === auth.uid || data.child('userId').val() === auth.uid)",
+        ".indexOn": ["userId"]
+      }
+    },
+    "config": {
+      ".read": "auth !== null",
+      ".write": false
+    },
+    "notifications": {
       "$userId": {
         ".read": "$userId === auth.uid",
         ".write": false

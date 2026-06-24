@@ -111,15 +111,15 @@ class GameRepository {
             val result = functions.getHttpsCallable("claimAdReward").call(data).await()
             (result.data as? Map<*, *>)?.get("success") as? Boolean ?: false
         } catch (e: Exception) {
-            // Firebase Function 없을 때 로컈 처리
+            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             val userRef = db.getReference("users/$userId")
             val snapshot = userRef.get().await()
             val user = snapshot.getValue(User::class.java) ?: return false
-            val adLogRef = db.getReference("adLogs/$userId/today")
+            val adLogRef = db.getReference("adLogs/$userId/$today")
             val logSnapshot = adLogRef.get().await()
             val todayCount = logSnapshot.getValue(Int::class.java) ?: 0
             if (todayCount >= 10) return false
-            userRef.child("ticketCount").setValue(user.ticketCount + 2).await()
+            userRef.child("ticketCount").setValue(user.ticketCount + 1).await()
             adLogRef.setValue(todayCount + 1).await()
             true
         }
@@ -127,7 +127,8 @@ class GameRepository {
 
     suspend fun getTodayAdCount(userId: String): Int {
         return try {
-            val snapshot = db.getReference("adLogs/$userId/today").get().await()
+            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val snapshot = db.getReference("adLogs/$userId/$today").get().await()
             snapshot.getValue(Int::class.java) ?: 0
         } catch (e: Exception) { 0 }
     }
