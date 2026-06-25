@@ -370,7 +370,11 @@ private fun WaitingResultContent(state: BattleUiState.WaitingResult) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(state.myChoice.emoji, fontSize = 64.sp)
+        Image(
+            painter = painterResource(rpsImageRes(state.myChoice)),
+            contentDescription = state.myChoice.label,
+            modifier = Modifier.size(80.dp)
+        )
         Spacer(Modifier.height(16.dp))
         Text("선택 완료!", style = MaterialTheme.typography.headlineMedium.copy(color = Primary))
         Text("상대방 선택 중...", style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary))
@@ -477,13 +481,21 @@ private fun BattleResultContent(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("나", style = MaterialTheme.typography.bodySmall.copy(color = Primary))
-                        Text(state.myChoice.emoji, fontSize = 48.sp)
+                        Image(
+                            painter = painterResource(rpsImageRes(state.myChoice)),
+                            contentDescription = state.myChoice.label,
+                            modifier = Modifier.size(60.dp)
+                        )
                         Text(state.myChoice.label, style = MaterialTheme.typography.labelLarge)
                     }
                     Text("VS", style = MaterialTheme.typography.headlineMedium.copy(color = TextSecondary))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(state.opponent.nickname.take(6), style = MaterialTheme.typography.bodySmall)
-                        Text(state.opponentChoice.emoji, fontSize = 48.sp)
+                        Image(
+                            painter = painterResource(rpsImageRes(state.opponentChoice)),
+                            contentDescription = state.opponentChoice.label,
+                            modifier = Modifier.size(60.dp)
+                        )
                         Text(state.opponentChoice.label, style = MaterialTheme.typography.labelLarge)
                     }
                 }
@@ -686,7 +698,11 @@ private fun RpsButton(choice: RpsChoice, onClick: () -> Unit) {
             .scale(scale),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = choice.emoji, fontSize = 40.sp)
+        Image(
+            painter = painterResource(rpsImageRes(choice)),
+            contentDescription = choice.label,
+            modifier = Modifier.size(52.dp)
+        )
         Spacer(Modifier.height(4.dp))
         Text(text = choice.label, style = MaterialTheme.typography.labelLarge)
     }
@@ -726,4 +742,10 @@ private fun InfoChip(emoji: String, label: String) {
             Text(label, style = MaterialTheme.typography.labelSmall)
         }
     }
+}
+
+private fun rpsImageRes(choice: RpsChoice): Int = when (choice) {
+    RpsChoice.ROCK     -> R.drawable.ic_rps_rock
+    RpsChoice.SCISSORS -> R.drawable.ic_rps_scissors
+    RpsChoice.PAPER    -> R.drawable.ic_rps_paper
 }
