@@ -173,7 +173,7 @@ private fun MyRankCard(rank: Int?, nickname: String, bestStreak: Int, totalWins:
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(8.dp),
         color = CardBackground
     ) {
         Box(

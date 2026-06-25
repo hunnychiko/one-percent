@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -163,7 +163,7 @@ fun MatchingScreen(
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
                             border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                         ) {
-                            Icon(Icons.Outlined.Close, contentDescription = "취소", tint = TextSecondary)
+                            Icon(Icons.Default.Close, contentDescription = "취소", tint = TextSecondary)
                             Spacer(Modifier.width(8.dp))
                             Text("취소")
                         }

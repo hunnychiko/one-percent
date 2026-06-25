@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CardGiftcard
+import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -190,7 +190,7 @@ private fun DailyBonusBanner(config: DailyBonusConfig?, onClaim: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                Icons.Outlined.CardGiftcard,
+                Icons.Default.CardGiftcard,
                 contentDescription = null,
                 tint = if (isDday) Gold else Primary,
                 modifier = Modifier.size(28.dp)

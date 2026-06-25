@@ -6,12 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Adjust
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.ConfirmationNumber
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.*
@@ -66,7 +61,7 @@ fun ProductDetailScreen(
                 title = { Text(product.productName, style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Outlined.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -84,30 +79,30 @@ fun ProductDetailScreen(
                             onClick = { /* 추첨 결과 화면으로 */ },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Success),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("참여 완료 · 결과 기다리는 중 ✅", style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold))
+                            Text("참여 완료 · 결과 기다리는 중 ✅", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                         }
                         hasTicket -> Button(
                             onClick = onChallenge,
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 if (isParticipating) "이어하기 ✊" else "도전하기 ✊",
-                                style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
                             )
                         }
                         else -> Button(
                             onClick = { showNoTicketDialog = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 "도전하기 ✊",
-                                style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
                             )
                         }
                     }
@@ -207,7 +202,7 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // 참여 현황 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground, shadowElevation = 2.dp) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("추첨방 현황", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(12.dp))
@@ -227,7 +222,7 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(16.dp))
 
                 // 연승 진행도 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground, shadowElevation = 2.dp) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -258,15 +253,15 @@ fun ProductDetailScreen(
                 Spacer(Modifier.height(16.dp))
 
                 // 규칙 카드
-                Surface(shape = RoundedCornerShape(16.dp), color = CardBackground, shadowElevation = 2.dp, modifier = Modifier.fillMaxWidth()) {
+                Surface(shape = RoundedCornerShape(8.dp), color = CardBackground, modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("참여 규칙", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(2.dp))
-                        RuleItem(Icons.Outlined.ConfirmationNumber, "승부권 1장 = 가위바위보 1회 대결")
-                        RuleItem(Icons.Outlined.Star, "목표 ${targetStreak}연승 달성 시 추첨 슬롯 자동 입장")
-                        RuleItem(Icons.Outlined.Person, "1인 1계정 1슬롯 참여")
-                        RuleItem(Icons.Outlined.Adjust, "100명 모집 완료 시 자동 추첨 · 1명 당첨")
-                        RuleItem(Icons.Outlined.Close, "패배 시 해당 도전 종료 (재도전 가능)")
+                        RuleItem(Icons.Default.ConfirmationNumber, "승부권 1장 = 가위바위보 1회 대결")
+                        RuleItem(Icons.Default.Star, "목표 ${targetStreak}연승 달성 시 추첨 슬롯 자동 입장")
+                        RuleItem(Icons.Default.Person, "1인 1계정 1슬롯 참여")
+                        RuleItem(Icons.Default.Adjust, "100명 모집 완료 시 자동 추첨 · 1명 당첨")
+                        RuleItem(Icons.Default.Close, "패배 시 해당 도전 종료 (재도전 가능)")
                     }
                 }
 

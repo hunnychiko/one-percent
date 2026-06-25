@@ -93,11 +93,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     .padding(horizontal = 32.dp)
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = if (pagerState.currentPage < pages.size - 1) "다음" else "시작하기",
-                    style = MaterialTheme.typography.titleMedium.copy(color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
                 )
             }
         }

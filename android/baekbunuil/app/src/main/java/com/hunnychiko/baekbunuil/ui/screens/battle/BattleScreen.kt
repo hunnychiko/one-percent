@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -201,13 +201,13 @@ private fun ForfeitDialog(
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Gold)
             ) {
                 Text(
                     "${product.directBuyLabel} 직접 획득하기",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = Color.White,
+                        color = Background,
                         fontWeight = FontWeight.Black
                     )
                 )
@@ -539,14 +539,14 @@ private fun BattleResultContent(
                         onClick = onRetryDraw,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(7.dp)
                     ) {
-                        Text("🤝 재대결하기", style = MaterialTheme.typography.titleMedium.copy(color = Color.White))
+                        Text("🤝 재대결하기", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                     }
                     OutlinedButton(
                         onClick = onHome,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(7.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                     ) {
                         Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
@@ -557,9 +557,9 @@ private fun BattleResultContent(
                     onClick = onContinue,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("▶ 광고 보고 계속 도전", style = MaterialTheme.typography.titleMedium.copy(color = Color.White, fontWeight = FontWeight.Bold))
+                    Text("▶ 광고 보고 계속 도전", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold))
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -567,14 +567,14 @@ private fun BattleResultContent(
                         onClick = onContinue,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(7.dp)
                     ) {
-                        Text("▶ 광고 보고 재도전", style = MaterialTheme.typography.titleMedium.copy(color = Color.White))
+                        Text("▶ 광고 보고 재도전", style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary))
                     }
                     OutlinedButton(
                         onClick = onHome,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(7.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceVariant)
                     ) {
                         Text("홈으로", style = MaterialTheme.typography.titleMedium.copy(color = TextSecondary))
@@ -604,7 +604,7 @@ private fun BattleResultContent(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(
-                            Icons.Outlined.Security,
+                            Icons.Default.Security,
                             contentDescription = null,
                             tint = Primary,
                             modifier = Modifier.size(14.dp)

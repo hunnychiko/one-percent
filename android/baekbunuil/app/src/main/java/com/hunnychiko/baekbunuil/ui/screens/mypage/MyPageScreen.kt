@@ -11,17 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Logout
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.Photo
-import androidx.compose.material.icons.outlined.PrivacyTip
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -75,7 +65,7 @@ fun MyPageScreen(
                 title = { Text("마이페이지", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Outlined.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -138,7 +128,7 @@ fun MyPageScreen(
                             modifier = Modifier.size(24.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.Edit, contentDescription = "변경", tint = TextPrimary, modifier = Modifier.size(12.dp))
+                                Icon(Icons.Default.Edit, contentDescription = "변경", tint = TextPrimary, modifier = Modifier.size(12.dp))
                             }
                         }
                     }
@@ -233,8 +223,8 @@ fun MyPageScreen(
                 Spacer(Modifier.height(12.dp))
                 HorizontalDivider(color = DividerColor)
                 Spacer(Modifier.height(12.dp))
-                SettingsItem(icon = Icons.Outlined.PrivacyTip, label = "개인정보처리방침", onClick = {})
-                SettingsItem(icon = Icons.Outlined.Article, label = "이용약관", onClick = {})
+                SettingsItem(icon = Icons.Default.PrivacyTip, label = "개인정보처리방침", onClick = {})
+                SettingsItem(icon = Icons.Default.Article, label = "이용약관", onClick = {})
             }
 
             // 친구 초대
@@ -244,15 +234,15 @@ fun MyPageScreen(
                 shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Icon(Icons.Outlined.PersonAdd, contentDescription = "친구 초대", modifier = Modifier.size(20.dp))
+                Icon(Icons.Default.PersonAdd, contentDescription = "친구 초대", modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("친구 초대하고 도전권 받기", style = MaterialTheme.typography.titleMedium)
             }
 
             // 앱 정보
             SectionCard(title = "앱 정보") {
-                SettingsItem(icon = Icons.Outlined.Info, label = "버전 1.0.0", onClick = {})
-                SettingsItem(icon = Icons.Outlined.Star, label = "앱 평가하기", onClick = {})
+                SettingsItem(icon = Icons.Default.Info, label = "버전 1.0.0", onClick = {})
+                SettingsItem(icon = Icons.Default.Star, label = "앱 평가하기", onClick = {})
             }
 
             // 로그아웃
@@ -263,7 +253,7 @@ fun MyPageScreen(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Error),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Error.copy(alpha = 0.5f))
             ) {
-                Icon(Icons.Outlined.Logout, contentDescription = "로그아웃", tint = Error, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Logout, contentDescription = "로그아웃", tint = Error, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("로그아웃", style = MaterialTheme.typography.titleMedium.copy(color = Error))
             }
@@ -313,7 +303,7 @@ fun MyPageScreen(
                                     modifier = Modifier.align(Alignment.BottomEnd).size(18.dp)
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Outlined.Check, null, tint = TextPrimary, modifier = Modifier.size(10.dp))
+                                        Icon(Icons.Default.Check, null, tint = TextPrimary, modifier = Modifier.size(10.dp))
                                     }
                                 }
                             }
@@ -329,7 +319,7 @@ fun MyPageScreen(
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(6.dp)
                 ) {
-                    Icon(Icons.Outlined.Photo, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Photo, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("사진 앨범에서 선택")
                 }

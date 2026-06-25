@@ -11,9 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,7 +65,7 @@ fun InviteScreen(
                 title = { Text("친구 초대", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Outlined.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -122,7 +122,7 @@ fun InviteScreen(
 
             // 내 초대 코드
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -159,7 +159,7 @@ fun InviteScreen(
                                 }
                             ) {
                                 Icon(
-                                    Icons.Outlined.ContentCopy,
+                                    Icons.Default.ContentCopy,
                                     contentDescription = "복사",
                                     tint = if (copied) Primary else TextSecondary
                                 )
@@ -186,10 +186,10 @@ fun InviteScreen(
                                 context.startActivity(Intent.createChooser(intent, "초대 공유"))
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary)
                         ) {
-                            Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text("친구에게 공유하기", style = MaterialTheme.typography.titleMedium)
                         }
@@ -204,7 +204,7 @@ fun InviteScreen(
 
             // 초대 코드 입력
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackground,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -233,7 +233,7 @@ fun InviteScreen(
                                 ))
                             },
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Primary,
                                 unfocusedBorderColor = DividerColor,
@@ -253,7 +253,7 @@ fun InviteScreen(
                                 }
                             },
                             enabled = inputCode.length == 6,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
                             modifier = Modifier.height(56.dp)
                         ) {
@@ -275,7 +275,7 @@ fun InviteScreen(
 
             // 초대 혜택 안내
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = CardBackgroundLight,
                 modifier = Modifier.fillMaxWidth()
             ) {
