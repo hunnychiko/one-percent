@@ -1,4 +1,4 @@
-package com.sleepsound.sleep_sound_app
+package com.lullify.app
 
 import io.flutter.embedding.android.FlutterActivity
 
