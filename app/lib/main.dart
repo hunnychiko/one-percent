@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,18 +14,41 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.sleepsound.app.audio',
-    androidNotificationChannelName: 'Lullify',
-    androidNotificationOngoing: true,
-    androidStopForegroundOnPause: true,
-  );
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('FlutterError: ${details.exception}\n${details.stack}');
+  };
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await runZonedGuarded(_initAndRun, (error, stack) {
+    debugPrint('Uncaught error: $error\n$stack');
+  });
+}
 
-  await MobileAds.instance.initialize();
+Future<void> _initAndRun() async {
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.lullify.app.audio',
+      androidNotificationChannelName: 'Lullify',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    ).timeout(const Duration(seconds: 10));
+  } catch (e, st) {
+    debugPrint('JustAudioBackground init failed (non-fatal): $e\n$st');
+  }
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e, st) {
+    debugPrint('Firebase init failed: $e\n$st');
+  }
+
+  try {
+    await MobileAds.instance.initialize();
+  } catch (e, st) {
+    debugPrint('MobileAds init failed (non-fatal): $e\n$st');
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
