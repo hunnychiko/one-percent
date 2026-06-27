@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // 사운드 파일: 누구나 읽기, 쓰기 (개발 단계 — 운영 전 인증 추가 필요)
+    match /sounds/{fileName} {
+      allow read: if true;
+      allow write: if request.resource.size <= 100 * 1024 * 1024
+        && request.resource.contentType.matches('audio/.*');
+    }
+
+    // 썸네일: 누구나 읽기/쓰기
+    match /thumbnails/{fileName} {
+      allow read: if true;
+      allow write: if request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
