@@ -108,7 +108,7 @@ export default function UploadPage() {
       const { updateSound } = await import('@/lib/sounds');
       await updateSound(soundId, { fileUrl, thumbnailUrl });
 
-      router.push(`/sounds/${soundId}`);
+      router.push(`/sounds?id=${soundId}`);
     } catch (err) {
       setErrors([`업로드 실패: ${err instanceof Error ? err.message : String(err)}`]);
       setIsUploading(false);
