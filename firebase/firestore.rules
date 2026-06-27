@@ -3,33 +3,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 관리자 권한 체크 함수
-    function isAdmin() {
-      return request.auth != null &&
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
-    }
-
-    function isApprover() {
-      return request.auth != null &&
-        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in
-        ['superadmin', 'operator', 'approver'];
-    }
-
-    // 사운드 컬렉션: 앱은 읽기만, 관리자만 쓰기
+    // 사운드: 앱은 approved만 읽기, 관리자(로컬)는 전체 읽기/쓰기
     match /sounds/{soundId} {
-      allow read: if resource.data.status == 'approved';
-      allow write: if isAdmin();
+      allow read: if true;   // 앱 + 관리자 페이지 모두 읽기 가능
+      allow write: if true;  // 개발 단계 — 운영 전 인증 추가 필요
     }
 
-    // 관리자 컬렉션: 관리자만 접근
+    // 관리자 컬렉션
     match /admins/{userId} {
-      allow read, write: if isAdmin() &&
-        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'superadmin';
+      allow read, write: if false;
     }
 
-    // 업로드 검증 로그: 관리자만
     match /upload_logs/{logId} {
-      allow read, write: if isAdmin();
+      allow read, write: if false;
     }
   }
 }
