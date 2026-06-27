@@ -7,7 +7,10 @@
  */
 
 import * as admin from 'firebase-admin';
-import * as serviceAccount from './serviceAccountKey.json'; // 실제 파일로 교체
+import * as fs from 'fs';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const serviceAccount = JSON.parse(fs.readFileSync('./serviceAccountKey.json', 'utf-8'));
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
